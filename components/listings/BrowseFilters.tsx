@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
 const PRICE_OPTIONS = [500, 800, 1000, 1200, 1500, 2000, 2500, 3000];

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowLeft } from 'lucide-react';
@@ -13,6 +13,7 @@ export default async function ListingDetailPage({
   const t = await getTranslations('listings');
   const supabase = await createClient();
 
+  // No join on profiles — there is no direct FK between listings and profiles
   const { data: listing } = await supabase
     .from('listings')
     .select(`
@@ -21,13 +22,19 @@ export default async function ListingDetailPage({
       size_sqm, rooms, furnished,
       available_from, available_to,
       arrondissement, quartier,
-      status, created_at,
-      profiles ( display_name )
+      status, created_at, user_id
     `)
     .eq('id', id)
     .single();
 
   if (!listing || listing.status === 'removed') notFound();
+
+  // Separate query for the poster's display name
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', listing.user_id)
+    .single();
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -40,7 +47,11 @@ export default async function ListingDetailPage({
     zwischenmiete: t('types.zwischenmiete'),
   };
 
-  const profile = listing.profiles as unknown as { display_name: string | null } | null;
+  const typeBadgeClass: Record<string, string> = {
+    ganze_wohnung: 'bg-blue-50 text-blue-700',
+    wg_zimmer: 'bg-green-50 text-green-700',
+    zwischenmiete: 'bg-amber-50 text-amber-700',
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -55,7 +66,7 @@ export default async function ListingDetailPage({
         {/* Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <span className="mb-2 inline-block rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+            <span className={`mb-2 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${typeBadgeClass[listing.type] ?? 'bg-stone-100 text-stone-600'}`}>
               {typeLabelMap[listing.type]}
             </span>
             <h1 className="font-serif text-2xl font-semibold text-stone-900 sm:text-3xl">
@@ -67,7 +78,7 @@ export default async function ListingDetailPage({
                 : (listing.quartier ?? '')}
             </p>
           </div>
-          <div className="text-right shrink-0">
+          <div className="shrink-0 text-right">
             <p className="font-serif text-2xl font-semibold text-stone-900">
               {listing.kaltmiete.toLocaleString('de-DE')} €
             </p>
@@ -135,7 +146,7 @@ export default async function ListingDetailPage({
         <div className="mt-8 border-t border-stone-100 pt-6">
           {user ? (
             <Link
-              href={`/nachrichten/neu?listing=${listing.id}`}
+              href={`/nachrichten/neu?listing=${listing.id}` as any}
               className="inline-flex w-full items-center justify-center rounded-lg bg-accent px-6 py-3.5 text-base font-medium text-white transition-colors hover:bg-accent-hover sm:w-auto"
             >
               {t('detail.contact')}
