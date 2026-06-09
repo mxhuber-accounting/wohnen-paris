@@ -1,21 +1,8 @@
-import dynamic from 'next/dynamic';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowLeft, Globe } from 'lucide-react';
+import HeatmapLoader from '@/components/map/HeatmapLoader';
 import type { CityStats } from '@/components/map/CommunityHeatmap';
-
-// SSR must be false for Leaflet
-const CommunityHeatmap = dynamic(
-  () => import('@/components/map/CommunityHeatmap'),
-  { ssr: false, loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-zinc-950">
-      <div className="text-center">
-        <Globe size={32} className="mx-auto mb-3 animate-pulse text-purple-400" />
-        <p className="text-sm text-white/50">Karte wird geladen…</p>
-      </div>
-    </div>
-  )}
-);
 
 const CITY_COORDS: Record<string, [number, number]> = {
   paris:     [48.8566, 2.3522],
@@ -126,7 +113,7 @@ export default async function MapPage() {
 
       {/* Full-height map */}
       <div className="relative flex-1 overflow-hidden">
-        <CommunityHeatmap cities={cityStats} />
+        <HeatmapLoader cities={cityStats} />
       </div>
     </div>
   );
