@@ -201,16 +201,24 @@ export default function ProfileForm({
 
       {/* Organization */}
       <div>
-        <label htmlFor="organization" className={labelClass}>Organisation</label>
-        <input
+        <label htmlFor="organization" className={labelClass}>Organisation / Schule</label>
+        <select
           id="organization"
-          type="text"
           value={form.organization ?? ''}
           onChange={(e) => set('organization', e.target.value)}
-          placeholder="z. B. HEC Paris, Sciences Po, LBS …"
-          maxLength={80}
           className={inputClass}
-        />
+        >
+          <option value="">— Keine Angabe —</option>
+          <option value="hec">HEC Paris</option>
+          <option value="sciencespo">Sciences Po</option>
+          <option value="escp">ESCP Business School</option>
+          <option value="insead">INSEAD</option>
+          <option value="lbs">London Business School</option>
+          <option value="lse">LSE</option>
+          <option value="ucl">UCL</option>
+          <option value="imperial">Imperial College London</option>
+          <option value="other">Andere</option>
+        </select>
       </div>
 
       {/* Languages */}

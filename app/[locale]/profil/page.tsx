@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ProfileForm from '@/components/profile/ProfileForm';
+import WhatsAppOptIn from '@/components/profile/WhatsAppOptIn';
 import { ExternalLink } from 'lucide-react';
 
 export async function generateMetadata() {
@@ -16,11 +17,18 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('display_name, avatar_url, bio, nationality, occupation, organization, languages, places_lived, instagram, website, created_at')
-    .eq('id', user.id)
-    .single();
+  const [{ data: profile }, { data: waSub }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('display_name, avatar_url, bio, nationality, occupation, organization, languages, places_lived, instagram, website, created_at')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('whatsapp_subscriptions')
+      .select('phone_e164, active')
+      .eq('user_id', user.id)
+      .single(),
+  ]);
 
   const t = await getTranslations('profile');
 
@@ -66,6 +74,11 @@ export default async function ProfilePage() {
           }}
         />
       </div>
+
+      <WhatsAppOptIn
+        userId={user.id}
+        initial={waSub ? { phone_e164: waSub.phone_e164, active: waSub.active } : null}
+      />
     </div>
   );
 }

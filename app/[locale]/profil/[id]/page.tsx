@@ -1,16 +1,15 @@
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
-import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
-import { MapPin, Globe, Languages, Briefcase, ArrowUpRight } from 'lucide-react';
-import type { Listing } from '@/components/listings/ListingCard';
+import { MapPin, Globe, Languages, Briefcase, ArrowUpRight, MessageSquare, Lock } from 'lucide-react';
+import { ORG_LABEL, ORG_COLOR } from '@/lib/orgs';
 
 const AVATAR_COLORS = [
   'bg-blue-100 text-blue-700',
-  'bg-green-100 text-green-700',
+  'bg-emerald-100 text-emerald-700',
   'bg-amber-100 text-amber-700',
   'bg-purple-100 text-purple-700',
-  'bg-pink-100 text-pink-700',
+  'bg-rose-100 text-rose-700',
 ];
 function avatarColor(id: string) {
   let h = 0;
@@ -20,22 +19,14 @@ function avatarColor(id: string) {
 
 const TYPE_BADGE: Record<string, string> = {
   ganze_wohnung: 'bg-blue-50 text-blue-700',
-  wg_zimmer: 'bg-green-50 text-green-700',
+  wg_zimmer:     'bg-green-50 text-green-700',
   zwischenmiete: 'bg-amber-50 text-amber-700',
 };
 const TYPE_LABEL: Record<string, string> = {
-  ganze_wohnung: 'Ganze Wohnung',
-  wg_zimmer: 'WG-Zimmer',
+  ganze_wohnung: 'Wohnung',
+  wg_zimmer:     'WG-Zimmer',
   zwischenmiete: 'Zwischenmiete',
 };
-
-function Tag({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-block rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-      {children}
-    </span>
-  );
-}
 
 export default async function PublicProfilePage({
   params,
@@ -44,160 +35,210 @@ export default async function PublicProfilePage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const t = await getTranslations('profile');
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, avatar_url, bio, nationality, occupation, languages, places_lived, instagram, website, created_at')
+    .select('id, display_name, avatar_url, bio, nationality, occupation, organization, languages, places_lived, instagram, website, created_at')
     .eq('id', id)
     .single();
 
   if (!profile) notFound();
 
-  const { data: listings } = await supabase
-    .from('listings')
-    .select('id, type, title, kaltmiete, available_from, arrondissement, quartier')
-    .eq('user_id', id)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .limit(3);
+  const { data: { user } } = await supabase.auth.getUser();
+  const isLoggedIn = !!user;
+  const isOwnProfile = user?.id === id;
 
-  const { data: posts } = await supabase
-    .from('community_posts')
-    .select('id, body, created_at, cities!city_id ( name, slug )')
-    .eq('user_id', id)
-    .order('created_at', { ascending: false })
-    .limit(5);
+  const [{ data: listings }, { data: posts }, { data: lookingPost }] = await Promise.all([
+    supabase
+      .from('listings')
+      .select('id, type, title, kaltmiete, available_from, arrondissement, quartier')
+      .eq('user_id', id).eq('status', 'active')
+      .order('created_at', { ascending: false }).limit(3),
+    supabase
+      .from('community_posts')
+      .select('id, body, created_at, cities!city_id ( name, slug )')
+      .eq('user_id', id)
+      .order('created_at', { ascending: false }).limit(3),
+    supabase
+      .from('looking_posts')
+      .select('id, title, description, budget_max, available_from, available_until')
+      .eq('user_id', id).eq('status', 'active')
+      .single(),
+  ]);
 
   const initial = (profile.display_name ?? 'A')[0].toUpperCase();
   const memberYear = new Date(profile.created_at).getFullYear();
-
-  const languageTags: string[] = profile.languages
-    ?.split(',')
-    .map((s: string) => s.trim())
-    .filter(Boolean) ?? [];
-
-  const placeTags: string[] = profile.places_lived
-    ?.split(',')
-    .map((s: string) => s.trim())
-    .filter(Boolean) ?? [];
+  const languageTags = profile.languages?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
+  const placeTags = profile.places_lived?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      {/* Profile card */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-          {/* Avatar */}
-          {profile.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={profile.display_name ?? ''}
-              className="h-24 w-24 rounded-full object-cover ring-4 ring-stone-100 shrink-0"
-            />
-          ) : (
-            <div className={`flex h-24 w-24 shrink-0 items-center justify-center rounded-full text-3xl font-bold ring-4 ring-stone-100 ${avatarColor(id)}`}>
-              {initial}
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+
+      {/* ── Hero card ──────────────────────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+        {/* Top band */}
+        <div className="h-24 bg-gradient-to-r from-zinc-100 to-zinc-50" />
+
+        <div className="px-6 pb-6">
+          {/* Avatar — overlaps the band */}
+          <div className="-mt-12 mb-4 flex items-end justify-between">
+            <div className="relative">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.display_name ?? ''}
+                  className="h-20 w-20 rounded-full object-cover ring-4 ring-surface"
+                />
+              ) : (
+                <div className={`flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold ring-4 ring-surface ${avatarColor(id)}`}>
+                  {initial}
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2">
+              {isLoggedIn && !isOwnProfile ? (
+                <Link
+                  href={`/nachrichten/${id}` as any}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover"
+                >
+                  <MessageSquare size={14} /> Nachricht
+                </Link>
+              ) : !isLoggedIn ? (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-muted hover:border-foreground hover:text-foreground"
+                >
+                  <Lock size={13} /> Anmelden zum Schreiben
+                </Link>
+              ) : null}
+              {isOwnProfile && (
+                <Link
+                  href="/profil"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-muted hover:text-foreground"
+                >
+                  Bearbeiten
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Name + org */}
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="font-serif text-2xl font-semibold text-foreground">
+              {profile.display_name ?? 'Anonym'}
+            </h1>
+            {profile.organization && (
+              <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${ORG_COLOR[profile.organization] ?? 'bg-zinc-100 text-zinc-600 border-zinc-200'}`}>
+                {ORG_LABEL[profile.organization] ?? profile.organization}
+              </span>
+            )}
+          </div>
+
+          {/* Meta row */}
+          <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
+            {profile.occupation && (
+              <span className="flex items-center gap-1"><Briefcase size={13} /> {profile.occupation}</span>
+            )}
+            {profile.nationality && (
+              <span className="flex items-center gap-1"><Globe size={13} /> {profile.nationality}</span>
+            )}
+            <span>Mitglied seit {memberYear}</span>
+          </div>
+
+          {/* Languages */}
+          {languageTags.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <Languages size={13} className="shrink-0 text-muted" />
+              {languageTags.map((l: string) => (
+                <span key={l} className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-foreground">
+                  {l}
+                </span>
+              ))}
             </div>
           )}
 
-          {/* Name + meta */}
-          <div className="flex-1 text-center sm:text-left">
-            <h1 className="font-serif text-2xl font-semibold text-stone-900">
-              {profile.display_name ?? 'Anonym'}
-            </h1>
-            <div className="mt-1 flex flex-wrap justify-center gap-3 text-sm text-stone-500 sm:justify-start">
-              {profile.occupation && (
-                <span className="flex items-center gap-1">
-                  <Briefcase size={13} /> {profile.occupation}
-                </span>
-              )}
-              {profile.nationality && (
-                <span className="flex items-center gap-1">
-                  <Globe size={13} /> {profile.nationality}
-                </span>
-              )}
-              <span className="text-stone-400">Mitglied seit {memberYear}</span>
+          {/* Places lived */}
+          {placeTags.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+              <MapPin size={13} className="shrink-0" />
+              {placeTags.map((p: string, i: number) => (
+                <span key={p}>{p}{i < placeTags.length - 1 ? ' →' : ''}</span>
+              ))}
             </div>
+          )}
 
-            {/* Languages */}
-            {languageTags.length > 0 && (
-              <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
-                <Languages size={13} className="mt-0.5 shrink-0 text-stone-400" />
-                {languageTags.map((l) => <Tag key={l}>{l}</Tag>)}
-              </div>
-            )}
+          {/* Bio */}
+          {profile.bio && (
+            <p className="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-foreground">
+              {profile.bio}
+            </p>
+          )}
 
-            {/* Social links */}
-            <div className="mt-3 flex flex-wrap justify-center gap-3 sm:justify-start">
+          {/* Social — blurred for logged-out */}
+          {(profile.instagram || profile.website) && (
+            <div className={`mt-4 flex flex-wrap gap-3 ${!isLoggedIn ? 'pointer-events-none select-none blur-sm' : ''}`}>
               {profile.instagram && (
-                <a
-                  href={`https://instagram.com/${profile.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-800"
-                >
-                  @ {profile.instagram}
+                <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground">
+                  @{profile.instagram}
                 </a>
               )}
               {profile.website && (
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-800"
-                >
-                  <Globe size={13} /> Website <ArrowUpRight size={11} />
+                <a href={profile.website} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground">
+                  <Globe size={12} /> Website <ArrowUpRight size={10} />
                 </a>
               )}
             </div>
-          </div>
+          )}
+          {(profile.instagram || profile.website) && !isLoggedIn && (
+            <p className="mt-1 text-xs text-muted">
+              <Link href="/login" className="underline hover:text-foreground">Anmelden</Link> um Kontaktdaten zu sehen
+            </p>
+          )}
         </div>
-
-        {/* Bio */}
-        {profile.bio && (
-          <p className="mt-6 border-t border-stone-100 pt-5 text-sm leading-relaxed text-stone-700">
-            {profile.bio}
-          </p>
-        )}
-
-        {/* Places lived */}
-        {placeTags.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 text-xs text-stone-400">
-              <MapPin size={12} /> Gelebt in:
-            </span>
-            {placeTags.map((p, i) => (
-              <span key={p} className="text-sm text-stone-600">
-                {p}{i < placeTags.length - 1 ? ' →' : ''}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Their active listings */}
+      {/* ── Currently looking ─────────────────────────────────────────────── */}
+      {lookingPost && (
+        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-amber-700">Sucht aktiv</p>
+          <p className="text-sm font-semibold text-foreground">{lookingPost.title}</p>
+          <p className="mt-1 text-sm text-muted line-clamp-2">{lookingPost.description}</p>
+          <div className="mt-2 flex flex-wrap gap-3 text-xs text-amber-700">
+            {lookingPost.budget_max && <span>Budget: bis {lookingPost.budget_max} €/Mo.</span>}
+            {lookingPost.available_from && (
+              <span>Ab {new Date(lookingPost.available_from).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Active listings ────────────────────────────────────────────────── */}
       {listings && listings.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-4 font-serif text-xl font-semibold text-stone-900">
-            {t('activeListings')} ({listings.length})
+          <h2 className="mb-3 font-serif text-lg font-semibold text-foreground">
+            Aktive Anzeigen
           </h2>
-          <div className="space-y-3">
-            {listings.map((l) => (
+          <div className="overflow-hidden rounded-xl border border-border">
+            {listings.map((l, i) => (
               <Link
                 key={l.id}
                 href={`/anzeigen/${l.id}` as any}
-                className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-5 py-4 transition-shadow hover:shadow-md"
+                className={`flex items-center justify-between bg-surface px-5 py-4 transition-colors hover:bg-zinc-50 ${i > 0 ? 'border-t border-border' : ''}`}
               >
                 <div>
-                  <span className={`mb-1 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${TYPE_BADGE[l.type] ?? 'bg-stone-100 text-stone-600'}`}>
+                  <span className={`mb-1 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${TYPE_BADGE[l.type] ?? 'bg-zinc-100 text-zinc-600'}`}>
                     {TYPE_LABEL[l.type]}
                   </span>
-                  <p className="text-sm font-semibold text-stone-900">{l.title}</p>
-                  <p className="text-xs text-stone-500">
+                  <p className="text-sm font-semibold text-foreground">{l.title}</p>
+                  <p className="text-xs text-muted">
                     {l.arrondissement != null ? `${l.arrondissement}. Arr.` : ''}{l.quartier ? ` · ${l.quartier}` : ''}
                   </p>
                 </div>
-                <p className="shrink-0 font-serif text-lg font-semibold text-stone-900">
+                <p className="shrink-0 font-serif text-lg font-semibold text-foreground">
                   {l.kaltmiete.toLocaleString('de-DE')} €
                 </p>
               </Link>
@@ -206,36 +247,35 @@ export default async function PublicProfilePage({
         </section>
       )}
 
-      {/* Their community posts */}
+      {/* ── Community posts ────────────────────────────────────────────────── */}
       {posts && posts.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-4 font-serif text-xl font-semibold text-stone-900">
-            {t('communityPosts')}
+          <h2 className="mb-3 font-serif text-lg font-semibold text-foreground">
+            Im Community-Chat
           </h2>
-          <div className="space-y-3">
-            {posts.map((p) => {
+          <div className="overflow-hidden rounded-xl border border-border">
+            {posts.map((p, i) => {
               const cityObj = p.cities as unknown as { name: string; slug: string } | null;
-              const CITY_BADGE: Record<string, string> = {
-                paris: 'bg-blue-50 text-blue-700',
-                london: 'bg-red-50 text-red-700',
-              };
               return (
-                <div key={p.id} className="rounded-xl border border-stone-200 bg-white px-5 py-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    {cityObj && (
-                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${CITY_BADGE[cityObj.slug] ?? 'bg-stone-100 text-stone-500'}`}>
-                        {cityObj.name}
-                      </span>
-                    )}
-                    <span className="ml-auto text-xs text-stone-400">
-                      {new Date(p.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                <div key={p.id} className={`bg-surface px-5 py-4 ${i > 0 ? 'border-t border-border' : ''} ${!isLoggedIn ? 'blur-sm select-none pointer-events-none' : ''}`}>
+                  {cityObj && (
+                    <span className="mb-1.5 inline-block rounded border border-border bg-background px-1.5 py-0.5 text-xs text-muted">
+                      {cityObj.name}
                     </span>
-                  </div>
-                  <p className="text-sm text-stone-700 line-clamp-3">{p.body}</p>
+                  )}
+                  <p className="text-sm leading-relaxed text-foreground line-clamp-2">{p.body}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {new Date(p.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  </p>
                 </div>
               );
             })}
           </div>
+          {!isLoggedIn && (
+            <p className="mt-2 text-center text-xs text-muted">
+              <Link href="/login" className="underline hover:text-foreground">Anmelden</Link> um Beiträge zu lesen
+            </p>
+          )}
         </section>
       )}
     </div>

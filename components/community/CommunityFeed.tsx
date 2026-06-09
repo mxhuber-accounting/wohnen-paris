@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Link } from '@/i18n/navigation';
-import { Send, Mail } from 'lucide-react';
+import { Send, Mail, Plus, X, MessageSquare } from 'lucide-react';
 
 export type CommunityPost = {
   id: string;
@@ -14,9 +14,19 @@ export type CommunityPost = {
   city_name: string | null;
   city_slug: string | null;
   organization: string | null;
+  channel_id: string | null;
 };
 
 export type City = { id: string; name: string; slug: string };
+
+export type Channel = {
+  id: string;
+  name: string;
+  slug: string;
+  city_id: string | null;
+  is_system: boolean;
+  creator_id: string | null;
+};
 
 const ORG_LABELS: Record<string, string> = { hec: 'HEC Paris', sciencespo: 'Sciences Po' };
 
@@ -32,19 +42,27 @@ function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 }
 
-const AVATAR_COLORS = ['bg-zinc-200', 'bg-stone-200', 'bg-neutral-200', 'bg-slate-200'];
-
+const AVATAR_COLORS = [
+  'bg-blue-100 text-blue-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-amber-100 text-amber-700',
+  'bg-purple-100 text-purple-700',
+  'bg-rose-100 text-rose-700',
+];
 function avatarColor(userId: string) {
-  let hash = 0;
-  for (let i = 0; i < userId.length; i++) hash = (hash * 31 + userId.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  let h = 0;
+  for (let i = 0; i < userId.length; i++) h = (h * 31 + userId.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
 }
 
 function PostCard({ post, currentUserId }: { post: CommunityPost; currentUserId: string }) {
   const initial = (post.display_name ?? 'A')[0].toUpperCase();
   return (
     <div className="flex gap-3 border-b border-border bg-surface px-5 py-4 last:border-b-0">
-      <a href={`/profil/${post.user_id}`} className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-foreground transition-opacity hover:opacity-70 ${avatarColor(post.user_id)}`}>
+      <a
+        href={`/profil/${post.user_id}`}
+        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ${avatarColor(post.user_id)}`}
+      >
         {initial}
       </a>
       <div className="min-w-0 flex-1">
@@ -55,11 +73,6 @@ function PostCard({ post, currentUserId }: { post: CommunityPost; currentUserId:
           {post.organization && (
             <span className="rounded border border-border bg-background px-1.5 py-0.5 text-xs text-muted">
               {ORG_LABELS[post.organization] ?? post.organization}
-            </span>
-          )}
-          {post.city_name && (
-            <span className="rounded border border-border bg-background px-1.5 py-0.5 text-xs text-muted">
-              {post.city_name}
             </span>
           )}
           <span className="ml-auto shrink-0 text-xs text-muted">{relativeTime(post.created_at)}</span>
@@ -78,24 +91,41 @@ function PostCard({ post, currentUserId }: { post: CommunityPost; currentUserId:
   );
 }
 
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+}
+
 export default function CommunityFeed({
   initialPosts,
   cities,
+  channels,
   currentUser,
   activeOrg,
+  activeCityId,
+  activeChannelId,
 }: {
   initialPosts: CommunityPost[];
   cities: City[];
+  channels: Channel[];
   currentUser: { id: string; display_name: string };
   activeOrg: string | null;
+  activeCityId: string | null;
+  activeChannelId: string | null;
 }) {
   const [posts, setPosts] = useState<CommunityPost[]>(initialPosts);
   const [body, setBody] = useState('');
-  const [cityId, setCityId] = useState(
-    cities.find((c) => c.slug === 'paris')?.id ?? cities[0]?.id ?? '',
-  );
   const [postOrg, setPostOrg] = useState<string>(activeOrg ?? '');
   const [sending, setSending] = useState(false);
+  const [showCreateChannel, setShowCreateChannel] = useState(false);
+  const [channelName, setChannelName] = useState('');
+  const [channelDesc, setChannelDesc] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const supabase = createClient();
 
@@ -105,9 +135,12 @@ export default function CommunityFeed({
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, async (payload) => {
         const row = payload.new as {
           id: string; user_id: string; body: string;
-          created_at: string; city_id: string | null; organization: string | null;
+          created_at: string; city_id: string | null;
+          organization: string | null; channel_id: string | null;
         };
         if (row.user_id === currentUser.id) return;
+        if (activeCityId && row.city_id !== activeCityId) return;
+        if (activeChannelId && row.channel_id !== activeChannelId) return;
         if (activeOrg && row.organization !== activeOrg) return;
 
         const { data: profile } = await supabase
@@ -119,17 +152,18 @@ export default function CommunityFeed({
           display_name: profile?.display_name ?? 'Anonym',
           city_name: city?.name ?? null, city_slug: city?.slug ?? null,
           organization: row.organization,
+          channel_id: row.channel_id,
         }, ...prev]);
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [currentUser.id, activeOrg]);
+  }, [currentUser.id, activeCityId, activeChannelId, activeOrg]);
 
   async function submit() {
     if (!body.trim() || sending) return;
     setSending(true);
 
-    const city = cities.find((c) => c.id === cityId) ?? null;
+    const city = cities.find((c) => c.id === activeCityId) ?? null;
     const optimistic: CommunityPost = {
       id: `opt-${Date.now()}`,
       user_id: currentUser.id,
@@ -139,6 +173,7 @@ export default function CommunityFeed({
       city_name: city?.name ?? null,
       city_slug: city?.slug ?? null,
       organization: postOrg || null,
+      channel_id: activeChannelId,
     };
 
     setPosts((prev) => [optimistic, ...prev]);
@@ -147,11 +182,39 @@ export default function CommunityFeed({
 
     await supabase.from('community_posts').insert({
       user_id: currentUser.id,
-      city_id: cityId || null,
+      city_id: activeCityId,
+      channel_id: activeChannelId,
       body: optimistic.body,
       organization: postOrg || null,
     });
     setSending(false);
+  }
+
+  async function createChannel() {
+    if (!channelName.trim() || creating) return;
+    setCreating(true);
+    setCreateError('');
+
+    const slug = slugify(channelName);
+    const { error } = await supabase.from('channels').insert({
+      name: channelName.trim(),
+      slug,
+      city_id: activeCityId,
+      description: channelDesc.trim() || null,
+      creator_id: currentUser.id,
+      is_system: false,
+    });
+
+    if (error) {
+      setCreateError(error.message.includes('unique') ? 'Ein Kanal mit diesem Namen existiert bereits.' : error.message);
+      setCreating(false);
+      return;
+    }
+
+    // Reload page to show new channel in sidebar
+    const url = new URL(window.location.href);
+    url.searchParams.set('channel', slug);
+    window.location.href = url.toString();
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -162,12 +225,74 @@ export default function CommunityFeed({
 
   return (
     <div>
+      {/* WhatsApp banner */}
+      <div className="mb-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+        <MessageSquare size={16} className="shrink-0 text-green-700" />
+        <p className="flex-1 text-xs text-green-800">
+          Community-Nachrichten können per WhatsApp benachrichtigt werden.{' '}
+          <a href="/profil" className="font-semibold underline">WhatsApp einrichten →</a>
+        </p>
+      </div>
+
+      {/* Create channel button */}
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setShowCreateChannel(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted hover:border-foreground hover:text-foreground"
+        >
+          <Plus size={12} /> Kanal erstellen
+        </button>
+      </div>
+
+      {/* Create channel modal */}
+      {showCreateChannel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setShowCreateChannel(false)}>
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-serif text-lg font-semibold text-foreground">Neuer Kanal</h2>
+              <button type="button" onClick={() => setShowCreateChannel(false)} className="text-muted hover:text-foreground">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted">Name</label>
+                <input
+                  value={channelName}
+                  onChange={(e) => setChannelName(e.target.value)}
+                  placeholder="z. B. 11. Arrondissement"
+                  maxLength={60}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted focus:border-foreground focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted">Beschreibung (optional)</label>
+                <input
+                  value={channelDesc}
+                  onChange={(e) => setChannelDesc(e.target.value)}
+                  placeholder="Worum geht es hier?"
+                  maxLength={200}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted focus:border-foreground focus:outline-none"
+                />
+              </div>
+              {createError && <p className="text-xs text-red-600">{createError}</p>}
+              <button
+                type="button"
+                onClick={createChannel}
+                disabled={!channelName.trim() || creating}
+                className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-40"
+              >
+                {creating ? 'Erstellen…' : 'Kanal erstellen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Composer */}
       <div className="mb-6 rounded-xl border border-border bg-surface p-4">
         <div className="mb-3 flex flex-wrap gap-2">
-          <select value={cityId} onChange={(e) => setCityId(e.target.value)} className={selectClass}>
-            {cities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
           <select value={postOrg} onChange={(e) => setPostOrg(e.target.value)} className={selectClass}>
             <option value="">Allgemein</option>
             <option value="hec">HEC Paris</option>
@@ -199,10 +324,12 @@ export default function CommunityFeed({
 
       {/* Feed */}
       {posts.length === 0 ? (
-        <p className="py-16 text-center text-sm text-muted">Noch keine Nachrichten. Sei der Erste!</p>
+        <p className="py-16 text-center text-sm text-muted">Noch keine Nachrichten in diesem Kanal. Sei der Erste!</p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-border">
-          {posts.map((post) => <PostCard key={post.id} post={post} currentUserId={currentUser.id} />)}
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} currentUserId={currentUser.id} />
+          ))}
         </div>
       )}
     </div>
