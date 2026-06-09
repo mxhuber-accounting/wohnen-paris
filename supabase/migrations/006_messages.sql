@@ -1,5 +1,9 @@
--- ── Conversations ────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.conversations (
+-- Drop if partially created from a previous attempt
+DROP TABLE IF EXISTS public.messages CASCADE;
+DROP TABLE IF EXISTS public.conversations CASCADE;
+
+-- ── Conversations ─────────────────────────────────────────────────────────────
+CREATE TABLE public.conversations (
   id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   participant_a   uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   participant_b   uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -11,20 +15,20 @@ CREATE TABLE IF NOT EXISTS public.conversations (
 
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can see their own conversations"
+CREATE POLICY "conv_select"
   ON public.conversations FOR SELECT
   USING (auth.uid() = participant_a OR auth.uid() = participant_b);
 
-CREATE POLICY "Users can create conversations they participate in"
+CREATE POLICY "conv_insert"
   ON public.conversations FOR INSERT
   WITH CHECK (auth.uid() = participant_a OR auth.uid() = participant_b);
 
-CREATE POLICY "Participants can update last_message_at"
+CREATE POLICY "conv_update"
   ON public.conversations FOR UPDATE
   USING (auth.uid() = participant_a OR auth.uid() = participant_b);
 
--- ── Messages ─────────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS public.messages (
+-- ── Messages ──────────────────────────────────────────────────────────────────
+CREATE TABLE public.messages (
   id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id uuid        NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
   sender_id       uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -35,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
 
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Participants can read messages"
+CREATE POLICY "msg_select"
   ON public.messages FOR SELECT
   USING (
     conversation_id IN (
@@ -44,25 +48,24 @@ CREATE POLICY "Participants can read messages"
     )
   );
 
-CREATE POLICY "Participants can send messages"
+CREATE POLICY "msg_insert"
   ON public.messages FOR INSERT
   WITH CHECK (
-    auth.uid() = sender_id AND
-    conversation_id IN (
+    auth.uid() = sender_id
+    AND conversation_id IN (
       SELECT id FROM public.conversations
       WHERE participant_a = auth.uid() OR participant_b = auth.uid()
     )
   );
 
-CREATE POLICY "Recipients can mark messages as read"
+CREATE POLICY "msg_update"
   ON public.messages FOR UPDATE
   USING (
-    sender_id != auth.uid() AND
-    conversation_id IN (
+    sender_id <> auth.uid()
+    AND conversation_id IN (
       SELECT id FROM public.conversations
       WHERE participant_a = auth.uid() OR participant_b = auth.uid()
     )
   );
 
-CREATE INDEX IF NOT EXISTS messages_conversation_id_idx
-  ON public.messages (conversation_id, created_at);
+CREATE INDEX messages_conv_idx ON public.messages (conversation_id, created_at);
