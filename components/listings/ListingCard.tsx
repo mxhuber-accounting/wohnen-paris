@@ -36,18 +36,8 @@ const TYPE_LABEL: Record<Listing['type'], string> = {
   zwischenmiete: 'Zwischenmiete',
 };
 
-const AVATAR_COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-purple-100 text-purple-700',
-  'bg-rose-100 text-rose-700',
-];
-
-function avatarColor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+function dicebear(userId: string) {
+  return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(userId)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 }
 
 export default function ListingCard({ listing }: { listing: Listing }) {
@@ -117,9 +107,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
       {/* Poster strip */}
       {listing.poster_id && (
         <div className="flex items-center gap-2 border-t border-border px-5 py-3">
-          <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${avatarColor(listing.poster_id)}`}>
-            {(listing.poster_name ?? 'A')[0].toUpperCase()}
-          </div>
+          <img src={dicebear(listing.poster_id)} alt="" className="h-6 w-6 shrink-0 rounded-full bg-zinc-100 object-cover" />
           <span className="truncate text-xs text-muted">
             {listing.poster_name ?? 'Mitglied'}
           </span>

@@ -20,17 +20,8 @@ type LookingPost = {
   created_at: string;
 };
 
-const AVATAR_COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-purple-100 text-purple-700',
-  'bg-rose-100 text-rose-700',
-];
-function avatarColor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+function dicebear(userId: string) {
+  return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(userId)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 }
 
 function formatDate(iso: string | null) {
@@ -83,9 +74,7 @@ export default function GesucheBoard({
                 {/* Header row */}
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <a href={`/profil/${p.user_id}`} className="flex items-center gap-2 group">
-                    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${avatarColor(p.user_id)}`}>
-                      {initial}
-                    </div>
+                    <img src={dicebear(p.user_id)} alt="" className="h-7 w-7 shrink-0 rounded-full bg-zinc-100 object-cover" />
                     <span className="text-sm font-semibold text-foreground group-hover:underline">
                       {p.poster_name ?? 'Mitglied'}
                     </span>

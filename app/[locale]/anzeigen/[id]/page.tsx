@@ -89,7 +89,7 @@ export default async function ListingDetailPage({
   };
 
   const memberYear = poster?.created_at ? new Date(poster.created_at).getFullYear() : null;
-  const posterInitial = (poster?.display_name ?? 'A')[0].toUpperCase();
+  const posterAvatarSrc = `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(listing.user_id)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -225,9 +225,7 @@ export default async function ListingDetailPage({
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Inseriert von</p>
           <div className="flex items-start gap-4">
             <a href={`/profil/${poster.id}`} className="shrink-0">
-              <div className={`flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold ${avatarColor(poster.id)}`}>
-                {posterInitial}
-              </div>
+              <img src={posterAvatarSrc} alt="" className="h-12 w-12 rounded-full bg-zinc-100 object-cover" />
             </a>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">

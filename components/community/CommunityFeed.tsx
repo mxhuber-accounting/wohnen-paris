@@ -54,28 +54,15 @@ function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 }
 
-const AVATAR_COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-purple-100 text-purple-700',
-  'bg-rose-100 text-rose-700',
-];
-function avatarColor(userId: string) {
-  let h = 0;
-  for (let i = 0; i < userId.length; i++) h = (h * 31 + userId.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+function dicebear(userId: string) {
+  return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(userId)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 }
 
 function PostCard({ post, currentUserId }: { post: CommunityPost; currentUserId: string }) {
-  const initial = (post.display_name ?? 'A')[0].toUpperCase();
   return (
     <div className="flex gap-3 border-b border-border bg-surface px-5 py-4 last:border-b-0">
-      <a
-        href={`/profil/${post.user_id}`}
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ${avatarColor(post.user_id)}`}
-      >
-        {initial}
+      <a href={`/profil/${post.user_id}`} className="mt-0.5 shrink-0 transition-opacity hover:opacity-70">
+        <img src={dicebear(post.user_id)} alt="" className="h-7 w-7 rounded-full bg-zinc-100 object-cover" />
       </a>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">

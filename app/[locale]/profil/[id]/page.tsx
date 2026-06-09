@@ -4,17 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { MapPin, Globe, Languages, Briefcase, ArrowUpRight, MessageSquare, Lock } from 'lucide-react';
 import { ORG_LABEL, ORG_COLOR } from '@/lib/orgs';
 
-const AVATAR_COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-purple-100 text-purple-700',
-  'bg-rose-100 text-rose-700',
-];
-function avatarColor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+function dicebear(userId: string) {
+  return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(userId)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 }
 
 const TYPE_BADGE: Record<string, string> = {
@@ -74,7 +65,6 @@ export default async function PublicProfilePage({
       .single(),
   ]);
 
-  const initial = (profile.display_name ?? 'A')[0].toUpperCase();
   const memberYear = new Date(profile.created_at).getFullYear();
   const languageTags = profile.languages?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
   const placeTags = profile.places_lived?.split(',').map((s: string) => s.trim()).filter(Boolean) ?? [];
@@ -91,17 +81,11 @@ export default async function PublicProfilePage({
           {/* Avatar — overlaps the band */}
           <div className="-mt-12 mb-4 flex items-end justify-between">
             <div className="relative">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.display_name ?? ''}
-                  className="h-20 w-20 rounded-full object-cover ring-4 ring-surface"
-                />
-              ) : (
-                <div className={`flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold ring-4 ring-surface ${avatarColor(id)}`}>
-                  {initial}
-                </div>
-              )}
+              <img
+                src={profile.avatar_url ?? dicebear(id)}
+                alt={profile.display_name ?? ''}
+                className="h-20 w-20 rounded-full object-cover ring-4 ring-surface bg-zinc-100"
+              />
             </div>
 
             {/* Action buttons */}

@@ -8,17 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { ORG_LABEL, ORG_COLOR_PLAIN as ORG_COLOR } from '@/lib/orgs';
 
-const AVATAR_COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-purple-100 text-purple-700',
-  'bg-rose-100 text-rose-700',
-];
-function avatarColor(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+function dicebear(userId: string) {
+  return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${encodeURIComponent(userId)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
 }
 
 export default function Header() {
@@ -106,13 +97,11 @@ export default function Header() {
                     onClick={() => setMenuOpen((v) => !v)}
                     className="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-zinc-100"
                   >
-                    {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
-                    ) : (
-                      <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${avatarColor(user.id)}`}>
-                        {initial}
-                      </div>
-                    )}
+                    <img
+                      src={profile?.avatar_url ?? dicebear(user.id)}
+                      alt=""
+                      className="h-7 w-7 rounded-full object-cover bg-zinc-100"
+                    />
                     <span className="max-w-[100px] truncate text-sm font-medium text-foreground">
                       {displayName}
                     </span>
@@ -132,9 +121,7 @@ export default function Header() {
                           onClick={() => setMenuOpen(false)}
                           className="flex items-center gap-2 px-4 py-3 text-sm text-foreground hover:bg-zinc-50"
                         >
-                          <div className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${avatarColor(user.id)}`}>
-                            {initial}
-                          </div>
+                          <img src={profile?.avatar_url ?? dicebear(user.id)} alt="" className="h-5 w-5 rounded-full object-cover bg-zinc-100" />
                           Mein Profil
                         </Link>
                         <Link
@@ -199,13 +186,7 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 rounded-md px-3 py-2.5 hover:bg-zinc-100"
                 >
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
-                  ) : (
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${avatarColor(user.id)}`}>
-                      {initial}
-                    </div>
-                  )}
+                  <img src={profile?.avatar_url ?? dicebear(user.id)} alt="" className="h-8 w-8 rounded-full object-cover bg-zinc-100" />
                   <div>
                     <p className="text-sm font-semibold text-foreground">{displayName}</p>
                     {profile?.organization && ORG_LABEL[profile.organization] && (
