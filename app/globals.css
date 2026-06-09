@@ -17,3 +17,15 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
 }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}

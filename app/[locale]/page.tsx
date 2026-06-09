@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { ArrowRight, MessageSquare, MapPin, Search, Shield, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import FaqAccordion from '@/components/landing/FaqAccordion';
+import PartnersBanner from '@/components/landing/PartnersBanner';
 
 export default async function LandingPage() {
   const t = await getTranslations('landing');
@@ -79,6 +80,9 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Partners rolling banner */}
+      <PartnersBanner />
 
       {/* City cards */}
       <section className="bg-white px-4 py-16 sm:px-6">
