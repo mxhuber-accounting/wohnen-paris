@@ -18,7 +18,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, avatar_url, bio, nationality, occupation, languages, places_lived, instagram, website, created_at')
+    .select('display_name, avatar_url, bio, nationality, occupation, organization, languages, places_lived, instagram, website, created_at')
     .eq('id', user.id)
     .single();
 
@@ -58,6 +58,7 @@ export default async function ProfilePage() {
             bio: profile?.bio ?? null,
             nationality: profile?.nationality ?? null,
             occupation: profile?.occupation ?? null,
+            organization: profile?.organization ?? null,
             languages: profile?.languages ?? null,
             places_lived: profile?.places_lived ?? null,
             instagram: profile?.instagram ?? null,

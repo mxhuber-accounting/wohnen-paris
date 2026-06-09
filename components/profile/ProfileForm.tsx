@@ -11,6 +11,7 @@ type ProfileData = {
   bio: string | null;
   nationality: string | null;
   occupation: string | null;
+  organization: string | null;
   languages: string | null;
   places_lived: string | null;
   instagram: string | null;
@@ -84,6 +85,7 @@ export default function ProfileForm({
         bio: form.bio || null,
         nationality: form.nationality || null,
         occupation: form.occupation || null,
+        organization: form.organization || null,
         languages: form.languages || null,
         places_lived: form.places_lived || null,
         instagram: form.instagram || null,
@@ -195,6 +197,20 @@ export default function ProfileForm({
             className={inputClass}
           />
         </div>
+      </div>
+
+      {/* Organization */}
+      <div>
+        <label htmlFor="organization" className={labelClass}>Organisation</label>
+        <input
+          id="organization"
+          type="text"
+          value={form.organization ?? ''}
+          onChange={(e) => set('organization', e.target.value)}
+          placeholder="z. B. HEC Paris, Sciences Po, LBS …"
+          maxLength={80}
+          className={inputClass}
+        />
       </div>
 
       {/* Languages */}

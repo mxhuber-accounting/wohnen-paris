@@ -33,6 +33,12 @@ export default function Header() {
             {t('community')}
           </Link>
           <Link
+            href="/jobs"
+            className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
+          >
+            Jobs
+          </Link>
+          <Link
             href="/anzeige-aufgeben"
             className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
           >
@@ -73,6 +79,13 @@ export default function Header() {
               onClick={() => setOpen(false)}
             >
               {t('community')}
+            </Link>
+            <Link
+              href="/jobs"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100"
+              onClick={() => setOpen(false)}
+            >
+              Jobs
             </Link>
             <Link
               href="/anzeige-aufgeben"
