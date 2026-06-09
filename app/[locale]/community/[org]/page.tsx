@@ -54,18 +54,18 @@ export default async function OrgCommunityPage({
 
   const memberIds = members?.map((m) => m.id) ?? [PLACEHOLDER_ID];
 
-  // Now fetch everything in parallel
+  // Now fetch everything in parallel — no profile joins (FKs point to auth.users, not profiles)
   const [{ data: recentPosts }, { data: listings }, { data: gesuche }] = await Promise.all([
     supabase
       .from('community_posts')
-      .select('id, body, user_id, created_at, profiles!user_id ( display_name )')
+      .select('id, body, user_id, created_at')
       .eq('organization', org)
       .order('created_at', { ascending: false })
       .limit(5),
 
     supabase
       .from('listings')
-      .select('id, title, type, kaltmiete, photos, cities ( name )')
+      .select('id, title, type, kaltmiete, photos, city_id')
       .eq('status', 'active')
       .in('user_id', memberIds)
       .order('created_at', { ascending: false })
@@ -73,11 +73,22 @@ export default async function OrgCommunityPage({
 
     supabase
       .from('looking_posts')
-      .select('id, title, budget_max, user_id, cities ( name ), profiles!user_id ( id, display_name )')
+      .select('id, title, budget_max, user_id, city_id')
+      .eq('status', 'active')
       .in('user_id', memberIds)
       .order('created_at', { ascending: false })
       .limit(4),
   ]);
+
+  // Batch-fetch cities for listings and gesuche
+  const cityIds = Array.from(new Set([
+    ...(listings ?? []).map((l) => l.city_id).filter(Boolean),
+    ...(gesuche ?? []).map((g) => g.city_id).filter(Boolean),
+  ])) as string[];
+  const { data: orgCities } = cityIds.length > 0
+    ? await supabase.from('cities').select('id, name').in('id', cityIds)
+    : { data: [] };
+  const orgCityMap = Object.fromEntries((orgCities ?? []).map((c) => [c.id, c]));
 
   const heroEmoji = ORG_EMOJI[org] ?? '🏫';
   const heroTagline = ORG_TAGLINE[org] ?? 'Willkommen in deiner Community.';
@@ -142,7 +153,7 @@ export default async function OrgCommunityPage({
               {listings && listings.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {listings.map((l) => {
-                    const city = l.cities as unknown as { name: string } | null;
+                    const city = l.city_id ? orgCityMap[l.city_id] ?? null : null;
                     const photos = l.photos as string[] | null;
                     const photo = photos?.[0];
                     return (
@@ -194,14 +205,14 @@ export default async function OrgCommunityPage({
                 </div>
                 <div className="space-y-3">
                   {recentPosts.map((p) => {
-                    const profile = p.profiles as unknown as { display_name: string | null } | null;
+                    const postProfile = members?.find((m) => m.id === p.user_id);
                     return (
                       <div key={p.id} className="flex gap-3 rounded-xl border border-border bg-surface p-4">
                         <img src={dicebear(p.user_id)} alt="" className="h-8 w-8 shrink-0 rounded-full bg-zinc-100 object-cover" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <Link href={`/profil/${p.user_id}` as any} className="text-sm font-semibold text-foreground hover:underline">
-                              {profile?.display_name ?? 'Mitglied'}
+                              {postProfile?.display_name ?? 'Mitglied'}
                             </Link>
                             <span className="text-xs text-muted">
                               {new Date(p.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}
@@ -225,24 +236,24 @@ export default async function OrgCommunityPage({
                 </div>
                 <div className="space-y-3">
                   {gesuche.map((g) => {
-                    const p = g.profiles as unknown as { id: string; display_name: string | null } | null;
-                    const city = g.cities as unknown as { name: string } | null;
+                    const gProfile = members?.find((m) => m.id === g.user_id);
+                    const city = g.city_id ? orgCityMap[g.city_id] ?? null : null;
                     return (
                       <div key={g.id} className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3">
                         <div className="flex items-center gap-3 min-w-0">
-                          <img src={dicebear(p?.id ?? g.user_id)} alt="" className="h-8 w-8 shrink-0 rounded-full bg-amber-100 object-cover" />
+                          <img src={dicebear(g.user_id)} alt="" className="h-8 w-8 shrink-0 rounded-full bg-amber-100 object-cover" />
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-foreground">{g.title}</p>
                             <p className="text-xs text-muted">
-                              {p?.display_name ?? 'Mitglied'}
+                              {gProfile?.display_name ?? 'Mitglied'}
                               {city ? ` · ${city.name}` : ''}
                               {g.budget_max ? ` · bis ${g.budget_max.toLocaleString('de-DE')} €` : ''}
                             </p>
                           </div>
                         </div>
-                        {user && user.id !== p?.id && (
+                        {user && user.id !== g.user_id && (
                           <Link
-                            href={`/nachrichten/${p?.id}` as any}
+                            href={`/nachrichten/${g.user_id}` as any}
                             className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-50"
                           >
                             Schreiben
