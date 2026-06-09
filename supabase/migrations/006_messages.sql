@@ -1,6 +1,4 @@
 -- ── Conversations ────────────────────────────────────────────────────────────
--- participant_a is always the lexicographically smaller UUID so the UNIQUE
--- constraint is symmetric (no duplicate rows for the same pair).
 CREATE TABLE IF NOT EXISTS public.conversations (
   id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   participant_a   uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -40,10 +38,9 @@ ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Participants can read messages"
   ON public.messages FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.conversations c
-      WHERE c.id = conversation_id
-        AND (c.participant_a = auth.uid() OR c.participant_b = auth.uid())
+    conversation_id IN (
+      SELECT id FROM public.conversations
+      WHERE participant_a = auth.uid() OR participant_b = auth.uid()
     )
   );
 
@@ -51,10 +48,9 @@ CREATE POLICY "Participants can send messages"
   ON public.messages FOR INSERT
   WITH CHECK (
     auth.uid() = sender_id AND
-    EXISTS (
-      SELECT 1 FROM public.conversations c
-      WHERE c.id = conversation_id
-        AND (c.participant_a = auth.uid() OR c.participant_b = auth.uid())
+    conversation_id IN (
+      SELECT id FROM public.conversations
+      WHERE participant_a = auth.uid() OR participant_b = auth.uid()
     )
   );
 
@@ -62,12 +58,11 @@ CREATE POLICY "Recipients can mark messages as read"
   ON public.messages FOR UPDATE
   USING (
     sender_id != auth.uid() AND
-    EXISTS (
-      SELECT 1 FROM public.conversations c
-      WHERE c.id = conversation_id
-        AND (c.participant_a = auth.uid() OR c.participant_b = auth.uid())
+    conversation_id IN (
+      SELECT id FROM public.conversations
+      WHERE participant_a = auth.uid() OR participant_b = auth.uid()
     )
   );
 
--- Index for fast conversation lookup
-CREATE INDEX IF NOT EXISTS messages_conversation_id_idx ON public.messages (conversation_id, created_at);
+CREATE INDEX IF NOT EXISTS messages_conversation_id_idx
+  ON public.messages (conversation_id, created_at);
