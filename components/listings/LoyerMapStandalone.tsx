@@ -14,7 +14,7 @@ export default function LoyerMapStandalone() {
   useEffect(() => {
     Promise.all([
       fetch('/api/loyer-reference').then(r => r.json()),
-      fetch('/paris-arrondissements.geojson').then(r => r.json()),
+      fetch('/paris-arrondissements.json').then(r => r.json()),
     ])
       .then(([rents, geoJson]) => {
         if (rents.error) { setError(rents.error); return; }
