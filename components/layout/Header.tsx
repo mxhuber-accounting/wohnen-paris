@@ -50,10 +50,11 @@ export default function Header() {
   }
 
   const links = [
+    ...(user ? [{ href: '/feed', label: 'Aktuell' }] : []),
     { href: '/anzeigen', label: t('browse') },
     { href: '/community', label: 'Community' },
     { href: '/gesuche', label: 'Gesuche' },
-    { href: '/jobs', label: 'Jobs' },
+    { href: '/map', label: 'Weltkarte' },
     { href: '/anzeige-aufgeben', label: t('post') },
   ];
 
