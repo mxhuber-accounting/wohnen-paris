@@ -56,6 +56,7 @@ export default function Header() {
     { href: '/schulen', label: 'Schulen' },
     { href: '/gesuche', label: 'Gesuche' },
     { href: '/map', label: 'Weltkarte' },
+    { href: '/loyers', label: 'Loyers' },
     { href: '/anzeige-aufgeben', label: t('post') },
   ];
 
