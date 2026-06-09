@@ -1,13 +1,19 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { ArrowRight, MessageSquare, Shield, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, Lock, MessageSquare, Shield, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import FaqAccordion from '@/components/landing/FaqAccordion';
 import PartnersBanner from '@/components/landing/PartnersBanner';
+import { SCHOOL_DOMAINS } from '@/lib/auth/allowed-domains';
+import { ORG_LABEL, ORG_EMOJI, ORG_COLOR } from '@/lib/orgs';
+
+const COMING_SOON_ORGS = ['essec', 'sciencespo', 'lbs', 'lse', 'escp', 'insead', 'ucl', 'imperial'];
 
 export default async function LandingPage() {
   const t = await getTranslations('landing');
   const supabase = await createClient();
+
+  const activeOrgs = Object.values(SCHOOL_DOMAINS);
 
   const { count: totalListings } = await supabase
     .from('listings')
@@ -76,6 +82,72 @@ export default async function LandingPage() {
 
       {/* Partners */}
       <PartnersBanner />
+
+      {/* Verification / Trust */}
+      <section className="border-b border-border bg-surface px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex items-start gap-4">
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background">
+              <Lock size={15} className="text-foreground" />
+            </div>
+            <div>
+              <h2 className="font-serif text-2xl font-semibold text-foreground">
+                Verifizierte Community
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+                Wohnen Abroad ist eine geschlossene Plattform — Zugang nur mit
+                verifizierter Hochschul-E-Mail. So bleibt die Community
+                vertrauenswürdig: Vermieter wissen, mit echten Studierenden zu
+                kommunizieren, und Studierende wissen, wer ihre Anfragen liest.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {/* Active schools */}
+            <div className="rounded-xl border border-border bg-background p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+                Jetzt verfügbar
+              </p>
+              <div className="space-y-2.5">
+                {activeOrgs.map((org) => (
+                  <div key={org} className="flex items-center gap-2.5">
+                    <CheckCircle size={14} className="shrink-0 text-green-500" />
+                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${ORG_COLOR[org]}`}>
+                      {ORG_EMOJI[org]} {ORG_LABEL[org]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Coming soon */}
+            <div className="rounded-xl border border-border bg-background p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+                Demnächst
+              </p>
+              <div className="space-y-2.5">
+                {COMING_SOON_ORGS.slice(0, 6).map((org) => (
+                  <div key={org} className="flex items-center gap-2.5 opacity-50">
+                    <Clock size={14} className="shrink-0 text-muted" />
+                    <span className="text-xs text-muted">
+                      {ORG_EMOJI[org]} {ORG_LABEL[org]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs text-muted">
+            Deine Hochschule fehlt?{' '}
+            <Link href="/login" className="underline underline-offset-2 hover:text-foreground">
+              Hier anfragen
+            </Link>
+            {' '}— wir fügen neue Schulen schrittweise hinzu.
+          </p>
+        </div>
+      </section>
 
       {/* Cities */}
       <section className="border-b border-border bg-surface px-4 py-16 sm:px-6">
