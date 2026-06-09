@@ -12,22 +12,21 @@ type CityPin = {
   lng: number;
   hasData: boolean;
   dataCity?: City;
-  status?: string; // shown for cities without data
 };
 
 const CITIES: CityPin[] = [
-  { id: 'paris',      name: 'Paris',       lat: 48.856, lng: 2.352,  hasData: true,  dataCity: 'paris' },
-  { id: 'lyon',       name: 'Lyon',        lat: 45.748, lng: 4.847,  hasData: true,  dataCity: 'lyon'  },
-  { id: 'marseille',  name: 'Marseille',   lat: 43.297, lng: 5.381,  hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'toulouse',   name: 'Toulouse',    lat: 43.605, lng: 1.444,  hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'nice',       name: 'Nice',        lat: 43.710, lng: 7.262,  hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'nantes',     name: 'Nantes',      lat: 47.218, lng: -1.554, hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'montpellier',name: 'Montpellier', lat: 43.611, lng: 3.877,  hasData: false, status: 'Données bientôt disponibles' },
-  { id: 'strasbourg', name: 'Strasbourg',  lat: 48.573, lng: 7.752,  hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'bordeaux',   name: 'Bordeaux',    lat: 44.838, lng: -0.579, hasData: false, status: 'Données bientôt disponibles' },
-  { id: 'lille',      name: 'Lille',       lat: 50.629, lng: 3.057,  hasData: false, status: 'Données bientôt disponibles' },
-  { id: 'rennes',     name: 'Rennes',      lat: 48.117, lng: -1.678, hasData: false, status: 'Pas d\'encadrement des loyers' },
-  { id: 'grenoble',   name: 'Grenoble',    lat: 45.188, lng: 5.724,  hasData: false, status: 'Données bientôt disponibles' },
+  { id: 'paris',       name: 'Paris',       lat: 48.856, lng: 2.352,  hasData: true,  dataCity: 'paris' },
+  { id: 'lyon',        name: 'Lyon',        lat: 45.748, lng: 4.847,  hasData: true,  dataCity: 'lyon'  },
+  { id: 'marseille',   name: 'Marseille',   lat: 43.297, lng: 5.381,  hasData: false },
+  { id: 'toulouse',    name: 'Toulouse',    lat: 43.605, lng: 1.444,  hasData: false },
+  { id: 'nice',        name: 'Nice',        lat: 43.710, lng: 7.262,  hasData: false },
+  { id: 'nantes',      name: 'Nantes',      lat: 47.218, lng: -1.554, hasData: false },
+  { id: 'montpellier', name: 'Montpellier', lat: 43.611, lng: 3.877,  hasData: false },
+  { id: 'strasbourg',  name: 'Strasbourg',  lat: 48.573, lng: 7.752,  hasData: false },
+  { id: 'bordeaux',    name: 'Bordeaux',    lat: 44.838, lng: -0.579, hasData: false },
+  { id: 'lille',       name: 'Lille',       lat: 50.629, lng: 3.057,  hasData: false },
+  { id: 'rennes',      name: 'Rennes',      lat: 48.117, lng: -1.678, hasData: false },
+  { id: 'grenoble',    name: 'Grenoble',    lat: 45.188, lng: 5.724,  hasData: false },
 ];
 
 type Props = {
@@ -75,12 +74,10 @@ export default function FranceMap({ onSelectCity }: Props) {
               className={`loyer-tooltip ${pin.hasData ? 'loyer-tooltip--active' : 'loyer-tooltip--muted'}`}
             >
               <span className="text-xs font-semibold">{pin.name}</span>
-              {!pin.hasData && pin.status && (
-                <span className="block text-[10px] text-zinc-400">{pin.status}</span>
-              )}
-              {pin.hasData && (
-                <span className="block text-[10px] text-purple-500">Cliquer pour explorer →</span>
-              )}
+              {pin.hasData
+                ? <span className="block text-[10px] text-purple-500">Cliquer pour explorer →</span>
+                : <span className="block text-[10px] text-zinc-400">Bientôt disponible</span>
+              }
             </Tooltip>
           </CircleMarker>
         ))}
