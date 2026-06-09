@@ -32,48 +32,58 @@
   },
   "landing": {
     "hero": {
-      "title": "Your apartment in Paris —",
+      "title": "Finding a flat abroad —",
       "titleAccent": "in German.",
-      "subtitle": "Apartment listings for German-speaking expats and students in Paris. Direct, transparent, no agency fees.",
+      "subtitle": "The German-speaking platform for apartments in Paris and London. By Germans, for Germans — transparent, direct, no agency fees.",
       "ctaBrowse": "Browse listings",
       "ctaPost": "Post a listing"
     },
     "stats": {
       "listings": "active listings",
-      "arrondissements": "arrondissements",
+      "cities": "cities",
       "free": "Free to use"
     },
+    "cities": {
+      "title": "Now available in",
+      "parisListings": "listings",
+      "londonSoon": "Coming soon",
+      "browse": "Browse listings"
+    },
     "values": {
-      "title": "Why Wohnen in Paris?",
-      "v1Title": "In German",
-      "v1Desc": "All listings and messages in German — no translating, no misunderstandings.",
+      "title": "Why Wohnen Abroad?",
+      "v1Title": "German network",
+      "v1Desc": "Connect with other German speakers in Paris and London. All listings from real people in the community — no spam, no ghost listings.",
       "v2Title": "Direct & no agency",
-      "v2Desc": "You write directly to the landlord or subtenant. No commission, no middlemen.",
-      "v3Title": "Real listings only",
-      "v3Desc": "Every listing comes from a real person. Suspicious posts can be reported."
+      "v2Desc": "You contact landlords or subtenants directly in German. No commission, no middlemen, no misunderstandings.",
+      "v3Title": "Simple & safe",
+      "v3Desc": "Magic-link login with no password. Suspicious listings can be reported. Founded by HEC alumni who know the struggle of finding a flat abroad."
     },
     "howItWorks": {
       "title": "How it works",
       "step1Num": "1",
-      "step1Title": "Find a listing",
-      "step1Desc": "Search current offers by arrondissement, price, room count and type.",
+      "step1Title": "Choose city & filters",
+      "step1Desc": "Search Paris or London, filter by price, area, size and furnishing.",
       "step2Num": "2",
-      "step2Title": "Send a message",
-      "step2Desc": "Write directly to the landlord in German — no agents, no detours.",
+      "step2Title": "Write directly",
+      "step2Desc": "Message the landlord or subtenant directly in German — no agents, no detours.",
       "step3Num": "3",
       "step3Title": "Move in",
-      "step3Desc": "Arrange a viewing and find your new home in Paris."
+      "step3Desc": "Arrange a viewing and find your new home abroad."
     },
     "faq": {
       "title": "Frequently asked questions",
       "items": [
         {
           "q": "Is it free to use?",
-          "a": "Yes — posting and searching listings is completely free."
+          "a": "Yes — posting and searching listings is completely free, for renters and landlords alike."
         },
         {
           "q": "Who is this platform for?",
-          "a": "For German speakers looking to rent or let in Paris — expats, students, au pairs and anyone else."
+          "a": "For German speakers looking to rent or let in Paris or London — expats, students, au pairs, interns and anyone else."
+        },
+        {
+          "q": "Which cities are available?",
+          "a": "Currently Paris and London. More cities are planned — if your city is missing, feel free to reach out."
         },
         {
           "q": "What types of listings are there?",
@@ -94,13 +104,21 @@
   "listings": {
     "pageTitle": "Listings",
     "noResults": "No listings found.",
+    "resultCount": "{count} listing found",
+    "resultCountPlural": "{count} listings found",
     "filters": {
       "type": "Type",
       "allTypes": "All types",
-      "arrondissement": "Arrondissement",
-      "allArr": "All",
+      "city": "City",
+      "allCities": "Paris & London",
+      "area": "Area",
+      "allAreas": "All areas",
       "maxPrice": "Max. price (€)",
-      "noPriceLimit": "No limit"
+      "noPriceLimit": "No limit",
+      "minSize": "Min. m²",
+      "anySize": "Any size",
+      "furnished": "Furnished",
+      "availableFrom": "Available from"
     },
     "types": {
       "ganze_wohnung": "Full apartment",
@@ -116,6 +134,7 @@
     "create": {
       "pageTitle": "Post a listing",
       "title": "Post a new listing",
+      "cityLabel": "City",
       "type": "Type of accommodation",
       "listingTitle": "Title",
       "listingTitleHint": "e.g. \"Bright flatshare room in the 11th arr.\"",
@@ -150,13 +169,14 @@
       "availableFrom": "Available from",
       "availableTo": "Available until",
       "arrondissement": "Arrondissement",
-      "perMonth": "€ / month",
+      "perMonth": "/ month",
       "notFound": "Listing not found.",
       "postedBy": "Posted by"
     }
   },
   "footer": {
-    "tagline": "Apartment listings for German speakers in Paris.",
+    "tagline": "Finding a flat abroad — in German.",
+    "hecByline": "An initiative by HEC Paris alumni.",
     "links": "Links",
     "legal": "Legal",
     "browse": "Browse listings",
@@ -164,6 +184,6 @@
     "impressum": "Imprint",
     "datenschutz": "Privacy policy",
     "agb": "Terms",
-    "copyright": "Wohnen in Paris. All rights reserved."
+    "copyright": "Wohnen Abroad. All rights reserved."
   }
 }

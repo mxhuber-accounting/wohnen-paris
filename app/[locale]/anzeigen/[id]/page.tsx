@@ -62,7 +62,9 @@ export default async function ListingDetailPage({
               {listing.title}
             </h1>
             <p className="mt-1 text-sm text-stone-500">
-              {listing.arrondissement}. Arr.{listing.quartier ? ` · ${listing.quartier}` : ''}
+              {listing.arrondissement != null
+                ? `${listing.arrondissement}. Arr.${listing.quartier ? ` · ${listing.quartier}` : ''}`
+                : (listing.quartier ?? '')}
             </p>
           </div>
           <div className="text-right shrink-0">

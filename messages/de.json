@@ -32,48 +32,58 @@
   },
   "landing": {
     "hero": {
-      "title": "Deine Wohnung in Paris —",
+      "title": "Wohnungssuche im Ausland —",
       "titleAccent": "auf Deutsch.",
-      "subtitle": "Wohnungsanzeigen für deutschsprachige Expats und Studierende in Paris. Direkt, transparent, ohne Makler.",
+      "subtitle": "Die deutschsprachige Plattform für Wohnungen in Paris und London. Von Deutschen, für Deutsche — transparent, direkt, ohne Makler.",
       "ctaBrowse": "Anzeigen durchsuchen",
       "ctaPost": "Anzeige aufgeben"
     },
     "stats": {
       "listings": "aktive Anzeigen",
-      "arrondissements": "Arrondissements",
+      "cities": "Städte",
       "free": "Kostenlos"
     },
+    "cities": {
+      "title": "Jetzt verfügbar in",
+      "parisListings": "Anzeigen",
+      "londonSoon": "Bald verfügbar",
+      "browse": "Anzeigen ansehen"
+    },
     "values": {
-      "title": "Warum Wohnen in Paris?",
-      "v1Title": "Auf Deutsch",
-      "v1Desc": "Alle Anzeigen und Nachrichten auf Deutsch — kein Übersetzen, kein Missverständnis.",
+      "title": "Warum Wohnen Abroad?",
+      "v1Title": "Deutsches Netzwerk",
+      "v1Desc": "Vernetze dich mit anderen Deutschsprachigen in Paris und London. Alle Anzeigen von echten Personen aus der Community — kein Spam, keine Phantominserate.",
       "v2Title": "Direkt & ohne Makler",
-      "v2Desc": "Du schreibst direkt dem Vermieter oder Nachmieter. Keine Provision, keine Zwischenhändler.",
-      "v3Title": "Nur echte Angebote",
-      "v3Desc": "Jede Anzeige kommt von einer echten Person. Verdächtige Inserate können gemeldet werden."
+      "v2Desc": "Du kontaktierst Vermieter oder Nachmieter direkt auf Deutsch. Keine Provision, keine Zwischenhändler, kein Missverständnis.",
+      "v3Title": "Einfach & sicher",
+      "v3Desc": "Magic-Link-Login ohne Passwort. Verdächtige Inserate können gemeldet werden. Ins Leben gerufen von HEC-Alumni, die selbst die Wohnungssuche im Ausland kennen."
     },
     "howItWorks": {
-      "title": "Wie es funktioniert",
+      "title": "So funktioniert es",
       "step1Num": "1",
-      "step1Title": "Anzeige finden",
-      "step1Desc": "Durchsuche aktuelle Angebote nach Arrondissement, Preis, Zimmeranzahl und Typ.",
+      "step1Title": "Stadt & Filter wählen",
+      "step1Desc": "Suche nach Paris oder London, filtere nach Preis, Arrondissement, Größe und Einrichtung.",
       "step2Num": "2",
-      "step2Title": "Nachricht senden",
-      "step2Desc": "Schreib dem Vermieter direkt auf Deutsch — kein Makler, keine Umwege.",
+      "step2Title": "Direkt schreiben",
+      "step2Desc": "Schreib dem Vermieter oder Nachmieter direkt auf Deutsch — kein Makler, keine Umwege.",
       "step3Num": "3",
       "step3Title": "Einziehen",
-      "step3Desc": "Vereinbare einen Besichtigungstermin und finde dein neues Zuhause in Paris."
+      "step3Desc": "Vereinbare einen Besichtigungstermin und finde dein neues Zuhause im Ausland."
     },
     "faq": {
       "title": "Häufige Fragen",
       "items": [
         {
           "q": "Ist die Nutzung kostenlos?",
-          "a": "Ja — das Einstellen und Suchen von Anzeigen ist vollständig kostenlos."
+          "a": "Ja — das Einstellen und Suchen von Anzeigen ist vollständig kostenlos, für Mieter und Vermieter."
         },
         {
           "q": "Für wen ist diese Plattform gedacht?",
-          "a": "Für deutschsprachige Menschen, die in Paris eine Wohnung suchen oder vermieten möchten — Expats, Studierende, Au-pairs und alle anderen."
+          "a": "Für deutschsprachige Menschen, die in Paris oder London eine Wohnung suchen oder vermieten möchten — Expats, Studierende, Au-pairs, Praktikanten und alle anderen."
+        },
+        {
+          "q": "Welche Städte sind verfügbar?",
+          "a": "Aktuell Paris und London. Weitere Städte sind in Planung — wenn du deine Stadt vermisst, schreib uns gern."
         },
         {
           "q": "Welche Arten von Anzeigen gibt es?",
@@ -94,13 +104,21 @@
   "listings": {
     "pageTitle": "Anzeigen",
     "noResults": "Keine Anzeigen gefunden.",
+    "resultCount": "{count} Anzeige gefunden",
+    "resultCountPlural": "{count} Anzeigen gefunden",
     "filters": {
       "type": "Typ",
       "allTypes": "Alle Typen",
-      "arrondissement": "Arrondissement",
-      "allArr": "Alle",
+      "city": "Stadt",
+      "allCities": "Paris & London",
+      "area": "Gebiet",
+      "allAreas": "Alle Gebiete",
       "maxPrice": "Max. Preis (€)",
-      "noPriceLimit": "Kein Limit"
+      "noPriceLimit": "Kein Limit",
+      "minSize": "Min. m²",
+      "anySize": "Alle Größen",
+      "furnished": "Möbliert",
+      "availableFrom": "Verfügbar ab"
     },
     "types": {
       "ganze_wohnung": "Ganze Wohnung",
@@ -116,6 +134,7 @@
     "create": {
       "pageTitle": "Anzeige aufgeben",
       "title": "Neue Anzeige aufgeben",
+      "cityLabel": "Stadt",
       "type": "Art der Unterkunft",
       "listingTitle": "Titel",
       "listingTitleHint": "z. B. 'Helles WG-Zimmer im 11. Arr.'",
@@ -150,13 +169,14 @@
       "availableFrom": "Verfügbar ab",
       "availableTo": "Verfügbar bis",
       "arrondissement": "Arrondissement",
-      "perMonth": "€ / Monat",
+      "perMonth": "/ Monat",
       "notFound": "Anzeige nicht gefunden.",
       "postedBy": "Inseriert von"
     }
   },
   "footer": {
-    "tagline": "Wohnungsanzeigen für Deutschsprachige in Paris.",
+    "tagline": "Wohnungssuche im Ausland — auf Deutsch.",
+    "hecByline": "Eine Initiative von HEC Paris Alumni.",
     "links": "Navigation",
     "legal": "Rechtliches",
     "browse": "Anzeigen durchsuchen",
@@ -164,6 +184,6 @@
     "impressum": "Impressum",
     "datenschutz": "Datenschutz",
     "agb": "AGB",
-    "copyright": "Wohnen in Paris. Alle Rechte vorbehalten."
+    "copyright": "Wohnen Abroad. Alle Rechte vorbehalten."
   }
 }

@@ -32,48 +32,58 @@
   },
   "landing": {
     "hero": {
-      "title": "Ton appartement à Paris —",
+      "title": "Trouver un logement à l'étranger —",
       "titleAccent": "en allemand.",
-      "subtitle": "Annonces de logement pour les germanophones à Paris. Direct, transparent, sans agence.",
+      "subtitle": "La plateforme germanophone pour les logements à Paris et Londres. Par des Allemands, pour des Allemands — transparent, direct, sans agence.",
       "ctaBrowse": "Parcourir les annonces",
       "ctaPost": "Publier une annonce"
     },
     "stats": {
       "listings": "annonces actives",
-      "arrondissements": "arrondissements",
+      "cities": "villes",
       "free": "Gratuit"
     },
+    "cities": {
+      "title": "Disponible dès maintenant à",
+      "parisListings": "annonces",
+      "londonSoon": "Bientôt disponible",
+      "browse": "Voir les annonces"
+    },
     "values": {
-      "title": "Pourquoi Wohnen in Paris ?",
-      "v1Title": "En allemand",
-      "v1Desc": "Toutes les annonces et messages en allemand — sans traduction, sans malentendu.",
+      "title": "Pourquoi Wohnen Abroad ?",
+      "v1Title": "Réseau germanophone",
+      "v1Desc": "Connecte-toi avec d'autres germanophones à Paris et Londres. Toutes les annonces de vraies personnes de la communauté — pas de spam, pas d'annonces fantômes.",
       "v2Title": "Direct & sans agence",
-      "v2Desc": "Tu écris directement au propriétaire ou locataire. Pas de commission, pas d'intermédiaire.",
-      "v3Title": "Vraies annonces uniquement",
-      "v3Desc": "Chaque annonce vient d'une vraie personne. Les annonces suspectes peuvent être signalées."
+      "v2Desc": "Tu contactes les propriétaires ou sous-locataires directement en allemand. Pas de commission, pas d'intermédiaires.",
+      "v3Title": "Simple & sécurisé",
+      "v3Desc": "Connexion par lien magique sans mot de passe. Les annonces suspectes peuvent être signalées. Fondé par des alumni de HEC Paris."
     },
     "howItWorks": {
       "title": "Comment ça marche",
       "step1Num": "1",
-      "step1Title": "Trouver une annonce",
-      "step1Desc": "Recherche par arrondissement, prix, nombre de pièces et type.",
+      "step1Title": "Choisir ville & filtres",
+      "step1Desc": "Recherche à Paris ou Londres, filtre par prix, quartier, superficie et meublé.",
       "step2Num": "2",
-      "step2Title": "Envoyer un message",
-      "step2Desc": "Écris directement au propriétaire en allemand — sans agence, sans détour.",
+      "step2Title": "Écrire directement",
+      "step2Desc": "Contacte le propriétaire ou sous-locataire directement en allemand.",
       "step3Num": "3",
       "step3Title": "Emménager",
-      "step3Desc": "Organise une visite et trouve ton nouveau chez-toi à Paris."
+      "step3Desc": "Organise une visite et trouve ton nouveau chez-toi à l'étranger."
     },
     "faq": {
       "title": "Questions fréquentes",
       "items": [
         {
           "q": "Est-ce gratuit ?",
-          "a": "Oui — publier et chercher des annonces est entièrement gratuit."
+          "a": "Oui — publier et chercher des annonces est entièrement gratuit, pour les locataires comme pour les propriétaires."
         },
         {
           "q": "Pour qui est cette plateforme ?",
-          "a": "Pour les germanophones qui cherchent ou louent à Paris — expatriés, étudiants, au pairs et autres."
+          "a": "Pour les germanophones qui cherchent ou louent à Paris ou Londres — expatriés, étudiants, au pairs, stagiaires et autres."
+        },
+        {
+          "q": "Quelles villes sont disponibles ?",
+          "a": "Actuellement Paris et Londres. D'autres villes sont en préparation."
         },
         {
           "q": "Quels types d'annonces ?",
@@ -81,7 +91,7 @@
         },
         {
           "q": "Comment protégez-vous mes données ?",
-          "a": "Nous ne stockons que le nécessaire. Ton adresse exacte n'est jamais affichée publiquement. Toutes les données sont traitées conformément au RGPD."
+          "a": "Nous ne stockons que le nécessaire. Ton adresse exacte n'est jamais affichée. Toutes les données sont traitées conformément au RGPD."
         }
       ]
     },
@@ -94,13 +104,21 @@
   "listings": {
     "pageTitle": "Annonces",
     "noResults": "Aucune annonce trouvée.",
+    "resultCount": "{count} annonce trouvée",
+    "resultCountPlural": "{count} annonces trouvées",
     "filters": {
       "type": "Type",
       "allTypes": "Tous les types",
-      "arrondissement": "Arrondissement",
-      "allArr": "Tous",
+      "city": "Ville",
+      "allCities": "Paris & Londres",
+      "area": "Quartier",
+      "allAreas": "Tous les quartiers",
       "maxPrice": "Prix max. (€)",
-      "noPriceLimit": "Sans limite"
+      "noPriceLimit": "Sans limite",
+      "minSize": "Min. m²",
+      "anySize": "Toutes tailles",
+      "furnished": "Meublé",
+      "availableFrom": "Disponible à partir du"
     },
     "types": {
       "ganze_wohnung": "Appartement entier",
@@ -116,6 +134,7 @@
     "create": {
       "pageTitle": "Publier une annonce",
       "title": "Publier une nouvelle annonce",
+      "cityLabel": "Ville",
       "type": "Type de logement",
       "listingTitle": "Titre",
       "listingTitleHint": "ex. « Chambre lumineuse en colocation, 11e arr. »",
@@ -150,13 +169,14 @@
       "availableFrom": "Disponible à partir du",
       "availableTo": "Disponible jusqu'au",
       "arrondissement": "Arrondissement",
-      "perMonth": "€ / mois",
+      "perMonth": "/ mois",
       "notFound": "Annonce introuvable.",
       "postedBy": "Publié par"
     }
   },
   "footer": {
-    "tagline": "Annonces de logement pour germanophones à Paris.",
+    "tagline": "Trouver un logement à l'étranger — en allemand.",
+    "hecByline": "Une initiative des alumni de HEC Paris.",
     "links": "Liens",
     "legal": "Mentions légales",
     "browse": "Parcourir les annonces",
@@ -164,6 +184,6 @@
     "impressum": "Mentions légales",
     "datenschutz": "Politique de confidentialité",
     "agb": "CGU",
-    "copyright": "Wohnen in Paris. Tous droits réservés."
+    "copyright": "Wohnen Abroad. Tous droits réservés."
   }
 }

@@ -10,8 +10,9 @@ export default async function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           {/* Brand */}
           <div>
-            <p className="font-serif text-lg font-semibold text-stone-900">Wohnen in Paris</p>
+            <p className="font-serif text-lg font-semibold text-stone-900">Wohnen Abroad</p>
             <p className="mt-2 text-sm text-stone-500">{t('tagline')}</p>
+            <p className="mt-1 text-xs text-stone-400">{t('hecByline')}</p>
           </div>
 
           {/* Nav links */}

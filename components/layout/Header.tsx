@@ -14,7 +14,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-baseline gap-1.5">
           <span className="font-serif text-xl font-semibold tracking-tight text-stone-900">
-            Wohnen in Paris
+            Wohnen Abroad
           </span>
         </Link>
 
