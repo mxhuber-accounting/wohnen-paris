@@ -91,6 +91,70 @@
       "button": "Jetzt kostenlos starten"
     }
   },
+  "listings": {
+    "pageTitle": "Anzeigen",
+    "noResults": "Keine Anzeigen gefunden.",
+    "filters": {
+      "type": "Typ",
+      "allTypes": "Alle Typen",
+      "arrondissement": "Arrondissement",
+      "allArr": "Alle",
+      "maxPrice": "Max. Preis (€)",
+      "noPriceLimit": "Kein Limit"
+    },
+    "types": {
+      "ganze_wohnung": "Ganze Wohnung",
+      "wg_zimmer": "WG-Zimmer",
+      "zwischenmiete": "Zwischenmiete"
+    },
+    "card": {
+      "rooms": "{n} Zi.",
+      "sqm": "{n} m²",
+      "furnished": "Möbliert",
+      "availableFrom": "Ab {date}"
+    },
+    "create": {
+      "pageTitle": "Anzeige aufgeben",
+      "title": "Neue Anzeige aufgeben",
+      "type": "Art der Unterkunft",
+      "listingTitle": "Titel",
+      "listingTitleHint": "z. B. 'Helles WG-Zimmer im 11. Arr.'",
+      "description": "Beschreibung",
+      "descriptionHint": "Beschreibe die Wohnung, Lage, Besonderheiten usw.",
+      "price": "Kaltmiete (€)",
+      "extras": "Nebenkosten (€, optional)",
+      "deposit": "Kaution (€, optional)",
+      "size": "Größe in m² (optional)",
+      "rooms": "Zimmeranzahl (optional)",
+      "furnished": "Möbliert",
+      "availableFrom": "Verfügbar ab",
+      "availableTo": "Verfügbar bis (optional, für Zwischenmiete)",
+      "arrondissement": "Arrondissement (1–20)",
+      "quartier": "Quartier / Viertel (optional)",
+      "submit": "Anzeige veröffentlichen",
+      "submitting": "Wird veröffentlicht…",
+      "loginRequired": "Du musst angemeldet sein, um eine Anzeige aufzugeben.",
+      "loginLink": "Jetzt anmelden"
+    },
+    "detail": {
+      "back": "Zurück zu allen Anzeigen",
+      "contact": "Vermieter kontaktieren",
+      "report": "Anzeige melden",
+      "price": "Kaltmiete",
+      "extras": "Nebenkosten",
+      "deposit": "Kaution",
+      "size": "Größe",
+      "rooms": "Zimmer",
+      "furnished": "Möbliert",
+      "unfurnished": "Unmöbliert",
+      "availableFrom": "Verfügbar ab",
+      "availableTo": "Verfügbar bis",
+      "arrondissement": "Arrondissement",
+      "perMonth": "€ / Monat",
+      "notFound": "Anzeige nicht gefunden.",
+      "postedBy": "Inseriert von"
+    }
+  },
   "footer": {
     "tagline": "Wohnungsanzeigen für Deutschsprachige in Paris.",
     "links": "Navigation",

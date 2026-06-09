@@ -91,6 +91,70 @@
       "button": "Commencer gratuitement"
     }
   },
+  "listings": {
+    "pageTitle": "Annonces",
+    "noResults": "Aucune annonce trouvée.",
+    "filters": {
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "arrondissement": "Arrondissement",
+      "allArr": "Tous",
+      "maxPrice": "Prix max. (€)",
+      "noPriceLimit": "Sans limite"
+    },
+    "types": {
+      "ganze_wohnung": "Appartement entier",
+      "wg_zimmer": "Chambre en colocation",
+      "zwischenmiete": "Sous-location"
+    },
+    "card": {
+      "rooms": "{n} p.",
+      "sqm": "{n} m²",
+      "furnished": "Meublé",
+      "availableFrom": "Dès {date}"
+    },
+    "create": {
+      "pageTitle": "Publier une annonce",
+      "title": "Publier une nouvelle annonce",
+      "type": "Type de logement",
+      "listingTitle": "Titre",
+      "listingTitleHint": "ex. « Chambre lumineuse en colocation, 11e arr. »",
+      "description": "Description",
+      "descriptionHint": "Décris le logement, l'emplacement, les points forts, etc.",
+      "price": "Loyer hors charges (€)",
+      "extras": "Charges (€, optionnel)",
+      "deposit": "Caution (€, optionnel)",
+      "size": "Surface en m² (optionnel)",
+      "rooms": "Nombre de pièces (optionnel)",
+      "furnished": "Meublé",
+      "availableFrom": "Disponible à partir du",
+      "availableTo": "Disponible jusqu'au (optionnel, pour sous-location)",
+      "arrondissement": "Arrondissement (1–20)",
+      "quartier": "Quartier (optionnel)",
+      "submit": "Publier l'annonce",
+      "submitting": "Publication en cours…",
+      "loginRequired": "Tu dois être connecté(e) pour publier une annonce.",
+      "loginLink": "Se connecter"
+    },
+    "detail": {
+      "back": "Retour aux annonces",
+      "contact": "Contacter le propriétaire",
+      "report": "Signaler l'annonce",
+      "price": "Loyer hors charges",
+      "extras": "Charges",
+      "deposit": "Caution",
+      "size": "Surface",
+      "rooms": "Pièces",
+      "furnished": "Meublé",
+      "unfurnished": "Non meublé",
+      "availableFrom": "Disponible à partir du",
+      "availableTo": "Disponible jusqu'au",
+      "arrondissement": "Arrondissement",
+      "perMonth": "€ / mois",
+      "notFound": "Annonce introuvable.",
+      "postedBy": "Publié par"
+    }
+  },
   "footer": {
     "tagline": "Annonces de logement pour germanophones à Paris.",
     "links": "Liens",

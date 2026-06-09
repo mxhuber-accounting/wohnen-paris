@@ -91,6 +91,70 @@
       "button": "Start for free"
     }
   },
+  "listings": {
+    "pageTitle": "Listings",
+    "noResults": "No listings found.",
+    "filters": {
+      "type": "Type",
+      "allTypes": "All types",
+      "arrondissement": "Arrondissement",
+      "allArr": "All",
+      "maxPrice": "Max. price (€)",
+      "noPriceLimit": "No limit"
+    },
+    "types": {
+      "ganze_wohnung": "Full apartment",
+      "wg_zimmer": "Flatshare room",
+      "zwischenmiete": "Sublet"
+    },
+    "card": {
+      "rooms": "{n} rm.",
+      "sqm": "{n} m²",
+      "furnished": "Furnished",
+      "availableFrom": "From {date}"
+    },
+    "create": {
+      "pageTitle": "Post a listing",
+      "title": "Post a new listing",
+      "type": "Type of accommodation",
+      "listingTitle": "Title",
+      "listingTitleHint": "e.g. \"Bright flatshare room in the 11th arr.\"",
+      "description": "Description",
+      "descriptionHint": "Describe the apartment, location, highlights, etc.",
+      "price": "Base rent (€)",
+      "extras": "Additional costs (€, optional)",
+      "deposit": "Deposit (€, optional)",
+      "size": "Size in m² (optional)",
+      "rooms": "Number of rooms (optional)",
+      "furnished": "Furnished",
+      "availableFrom": "Available from",
+      "availableTo": "Available until (optional, for sublets)",
+      "arrondissement": "Arrondissement (1–20)",
+      "quartier": "Neighbourhood (optional)",
+      "submit": "Publish listing",
+      "submitting": "Publishing…",
+      "loginRequired": "You must be logged in to post a listing.",
+      "loginLink": "Log in now"
+    },
+    "detail": {
+      "back": "Back to all listings",
+      "contact": "Contact landlord",
+      "report": "Report listing",
+      "price": "Base rent",
+      "extras": "Additional costs",
+      "deposit": "Deposit",
+      "size": "Size",
+      "rooms": "Rooms",
+      "furnished": "Furnished",
+      "unfurnished": "Unfurnished",
+      "availableFrom": "Available from",
+      "availableTo": "Available until",
+      "arrondissement": "Arrondissement",
+      "perMonth": "€ / month",
+      "notFound": "Listing not found.",
+      "postedBy": "Posted by"
+    }
+  },
   "footer": {
     "tagline": "Apartment listings for German speakers in Paris.",
     "links": "Links",
