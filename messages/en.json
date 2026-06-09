@@ -1,4 +1,28 @@
 {
+  "auth": {
+    "pageTitle": "Log in",
+    "title": "Welcome back",
+    "subtitle": "Enter your email address and we'll send you a login link.",
+    "emailLabel": "Email address",
+    "submit": "Send magic link",
+    "sending": "Sending…",
+    "noPassword": "No password needed.",
+    "sentTitle": "Link sent!",
+    "sentDesc": "We sent a login link to {email}. Check your inbox.",
+    "linkExpired": "This link has expired or is invalid. Please try again.",
+    "error": "Something went wrong. Please try again."
+  },
+  "profile": {
+    "pageTitle": "My profile",
+    "title": "My profile",
+    "email": "Email address",
+    "memberSince": "Member since {date}",
+    "displayName": "Display name",
+    "displayNameHint": "Shown on your listings (first name recommended).",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved!"
+  },
   "nav": {
     "browse": "Listings",
     "post": "Post a listing",

@@ -1,4 +1,28 @@
 {
+  "auth": {
+    "pageTitle": "Anmelden",
+    "title": "Willkommen zurück",
+    "subtitle": "Gib deine E-Mail-Adresse ein — wir schicken dir einen Anmeldelink.",
+    "emailLabel": "E-Mail-Adresse",
+    "submit": "Magic Link senden",
+    "sending": "Wird gesendet…",
+    "noPassword": "Kein Passwort nötig.",
+    "sentTitle": "Link verschickt!",
+    "sentDesc": "Wir haben einen Anmeldelink an {email} geschickt. Schau in dein Postfach.",
+    "linkExpired": "Dieser Link ist abgelaufen oder ungültig. Bitte versuch es nochmal.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuch es nochmal."
+  },
+  "profile": {
+    "pageTitle": "Mein Profil",
+    "title": "Mein Profil",
+    "email": "E-Mail-Adresse",
+    "memberSince": "Mitglied seit {date}",
+    "displayName": "Anzeigename",
+    "displayNameHint": "Wird auf deinen Anzeigen angezeigt (nur Vorname empfohlen).",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "saved": "Gespeichert!"
+  },
   "nav": {
     "browse": "Anzeigen",
     "post": "Anzeige aufgeben",

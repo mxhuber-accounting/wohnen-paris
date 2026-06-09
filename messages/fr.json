@@ -1,4 +1,28 @@
 {
+  "auth": {
+    "pageTitle": "Se connecter",
+    "title": "Bon retour",
+    "subtitle": "Entre ton adresse e-mail et nous t'enverrons un lien de connexion.",
+    "emailLabel": "Adresse e-mail",
+    "submit": "Envoyer le lien magique",
+    "sending": "Envoi en cours…",
+    "noPassword": "Pas de mot de passe nécessaire.",
+    "sentTitle": "Lien envoyé !",
+    "sentDesc": "Nous avons envoyé un lien de connexion à {email}. Vérifie ta boîte mail.",
+    "linkExpired": "Ce lien a expiré ou est invalide. Veuillez réessayer.",
+    "error": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "profile": {
+    "pageTitle": "Mon profil",
+    "title": "Mon profil",
+    "email": "Adresse e-mail",
+    "memberSince": "Membre depuis le {date}",
+    "displayName": "Nom d'affichage",
+    "displayNameHint": "Affiché sur tes annonces (prénom recommandé).",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré !"
+  },
   "nav": {
     "browse": "Annonces",
     "post": "Publier une annonce",
