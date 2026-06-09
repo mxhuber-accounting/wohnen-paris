@@ -20,10 +20,10 @@ export type Listing = {
   city_name?: string;
 };
 
-const typeBadgeClass: Record<Listing['type'], string> = {
-  ganze_wohnung: 'bg-blue-50 text-blue-700',
-  wg_zimmer: 'bg-green-50 text-green-700',
-  zwischenmiete: 'bg-amber-50 text-amber-700',
+const TYPE_LABEL: Record<Listing['type'], string> = {
+  ganze_wohnung: 'Wohnung',
+  wg_zimmer: 'WG-Zimmer',
+  zwischenmiete: 'Zwischenmiete',
 };
 
 export default function ListingCard({ listing }: { listing: Listing }) {
@@ -35,7 +35,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
     year: 'numeric',
   });
 
-  const locationLine =
+  const location =
     listing.arrondissement != null
       ? `${listing.arrondissement}. Arr.${listing.quartier ? ` · ${listing.quartier}` : ''}`
       : (listing.quartier ?? '');
@@ -43,42 +43,38 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
       href={`/anzeigen/${listing.id}`}
-      className="flex flex-col rounded-xl border border-stone-200 bg-white p-5 transition-shadow hover:shadow-md"
+      className="group flex flex-col rounded-xl border border-border bg-surface p-5 transition-all hover:border-zinc-300 hover:shadow-sm"
     >
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex flex-wrap gap-1.5">
-          <span className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${typeBadgeClass[listing.type]}`}>
-            {t(`types.${listing.type}`)}
+          <span className="inline-block rounded-md border border-border bg-background px-2 py-0.5 text-xs font-medium text-muted">
+            {TYPE_LABEL[listing.type]}
           </span>
           {listing.city_name && (
-            <span className="inline-block rounded-md bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-500">
+            <span className="inline-block rounded-md border border-border bg-background px-2 py-0.5 text-xs font-medium text-muted">
               {listing.city_name}
             </span>
           )}
         </div>
-        <span className="text-right font-serif text-lg font-semibold text-stone-900 whitespace-nowrap">
+        <span className="shrink-0 font-serif text-lg font-semibold text-foreground">
           {listing.kaltmiete.toLocaleString('de-DE')} €
-          <span className="font-sans text-xs font-normal text-stone-400"> /Mo.</span>
+          <span className="font-sans text-xs font-normal text-muted"> /Mo.</span>
         </span>
       </div>
 
-      <h3 className="line-clamp-2 text-sm font-semibold text-stone-900">{listing.title}</h3>
+      <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+        {listing.title}
+      </h3>
 
-      {locationLine && (
-        <p className="mt-1 text-xs text-stone-500">{locationLine}</p>
+      {location && (
+        <p className="mt-1 text-xs text-muted">{location}</p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-2 border-t border-stone-100 pt-3 text-xs text-stone-500">
-        {listing.rooms != null && (
-          <span>{t('card.rooms', { n: listing.rooms })}</span>
-        )}
-        {listing.size_sqm != null && (
-          <span>{t('card.sqm', { n: listing.size_sqm })}</span>
-        )}
-        {listing.furnished && (
-          <span className="text-stone-400">{t('card.furnished')}</span>
-        )}
-        <span className="ml-auto">{t('card.availableFrom', { date })}</span>
+      <div className="mt-auto flex flex-wrap gap-3 border-t border-border pt-3 mt-3 text-xs text-muted">
+        {listing.rooms != null && <span>{listing.rooms} Zi.</span>}
+        {listing.size_sqm != null && <span>{listing.size_sqm} m²</span>}
+        {listing.furnished && <span>Möbliert</span>}
+        <span className="ml-auto">Ab {date}</span>
       </div>
     </Link>
   );

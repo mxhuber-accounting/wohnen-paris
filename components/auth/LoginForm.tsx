@@ -103,7 +103,7 @@ export default function LoginForm() {
         <form action={requestAction} className="space-y-4">
           <input type="hidden" name="email" value={email} />
           <div>
-            <label className="block text-sm font-medium text-stone-700">E-Mail</label>
+            <label className="block text-sm font-medium text-foreground">E-Mail</label>
             <input
               type="email"
               value={email}
@@ -112,7 +112,7 @@ export default function LoginForm() {
             />
           </div>
           <div>
-            <label htmlFor="req-name" className="block text-sm font-medium text-stone-700">
+            <label htmlFor="req-name" className="block text-sm font-medium text-foreground">
               Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -121,11 +121,11 @@ export default function LoginForm() {
               type="text"
               required
               placeholder="Vorname Nachname"
-              className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-1.5 block w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
             />
           </div>
           <div>
-            <label htmlFor="req-org" className="block text-sm font-medium text-stone-700">
+            <label htmlFor="req-org" className="block text-sm font-medium text-foreground">
               Organisation <span className="text-red-500">*</span>
             </label>
             <input
@@ -134,11 +134,11 @@ export default function LoginForm() {
               type="text"
               required
               placeholder="z. B. Sciences Po, LBS, LSE …"
-              className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-1.5 block w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
             />
           </div>
           <div>
-            <label htmlFor="req-msg" className="block text-sm font-medium text-stone-700">
+            <label htmlFor="req-msg" className="block text-sm font-medium text-foreground">
               Kurze Vorstellung <span className="text-stone-400">(optional)</span>
             </label>
             <textarea
@@ -146,7 +146,7 @@ export default function LoginForm() {
               name="message"
               rows={2}
               placeholder="Wer bist du und warum möchtest du Zugang?"
-              className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-1.5 block w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
             />
           </div>
           {requestState?.error && (
@@ -176,7 +176,7 @@ export default function LoginForm() {
     return (
       <form onSubmit={handleSignup} className="space-y-4">
         <div>
-          <label htmlFor="signup-email" className="block text-sm font-medium text-stone-700">
+          <label htmlFor="signup-email" className="block text-sm font-medium text-foreground">
             E-Mail-Adresse
           </label>
           <input
@@ -186,11 +186,11 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@hec.edu"
-            className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="mt-1.5 block w-full rounded-lg border border-border px-4 py-3 text-sm text-foreground placeholder-stone-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
           />
         </div>
         <div>
-          <label htmlFor="signup-password" className="block text-sm font-medium text-stone-700">
+          <label htmlFor="signup-password" className="block text-sm font-medium text-foreground">
             Passwort{' '}
             <span className="font-normal text-stone-400">(mind. 8 Zeichen)</span>
           </label>
@@ -202,7 +202,7 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="mt-1.5 block w-full rounded-lg border border-border px-4 py-3 text-sm text-foreground placeholder-stone-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
           />
         </div>
 
@@ -234,7 +234,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-stone-700">
+        <label htmlFor="email" className="block text-sm font-medium text-foreground">
           E-Mail-Adresse
         </label>
         <input
@@ -244,11 +244,11 @@ export default function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="du@hec.edu"
-          className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="mt-1.5 block w-full rounded-lg border border-border px-4 py-3 text-sm text-foreground placeholder-stone-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-stone-700">
+        <label htmlFor="password" className="block text-sm font-medium text-foreground">
           Passwort
         </label>
         <input
@@ -258,7 +258,7 @@ export default function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="mt-1.5 block w-full rounded-lg border border-stone-300 px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="mt-1.5 block w-full rounded-lg border border-border px-4 py-3 text-sm text-foreground placeholder-stone-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
         />
       </div>
 

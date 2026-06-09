@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, MessageSquare } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -15,135 +15,118 @@ export default function Header() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await createClient().auth.signOut();
     window.location.href = '/';
   }
 
-  const navLinks = (
-    <>
-      <Link
-        href="/anzeigen"
-        className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
-        onClick={() => setOpen(false)}
-      >
-        {t('browse')}
-      </Link>
-      <Link
-        href="/community"
-        className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
-        onClick={() => setOpen(false)}
-      >
-        {t('community')}
-      </Link>
-      <Link
-        href="/jobs"
-        className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
-        onClick={() => setOpen(false)}
-      >
-        Jobs
-      </Link>
-      <Link
-        href="/anzeige-aufgeben"
-        className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
-        onClick={() => setOpen(false)}
-      >
-        {t('post')}
-      </Link>
-    </>
-  );
+  const links = [
+    { href: '/anzeigen', label: t('browse') },
+    { href: '/community', label: 'Community' },
+    { href: '/jobs', label: 'Jobs' },
+    { href: '/anzeige-aufgeben', label: t('post') },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-baseline gap-1.5">
-          <span className="font-serif text-xl font-semibold tracking-tight text-stone-900">
-            Wohnen Abroad
-          </span>
+    <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+
+        <Link href="/" className="font-serif text-lg font-semibold tracking-tight text-foreground">
+          Wohnen Abroad
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks}
-
-          {user ? (
-            <div className="ml-2 flex items-center gap-1">
-              <Link
-                href="/profil"
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100"
-              >
-                <User size={15} />
-                <span className="max-w-[120px] truncate">
-                  {user.email?.split('@')[0]}
-                </span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="rounded-md p-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700"
-                title="Abmelden"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
-          ) : (
+        {/* Desktop */}
+        <nav className="hidden items-center gap-0.5 md:flex">
+          {links.map(({ href, label }) => (
             <Link
-              href="/login"
-              className="ml-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              key={href}
+              href={href}
+              className="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:bg-zinc-100 hover:text-foreground"
             >
-              {t('login')}
+              {label}
             </Link>
-          )}
-        </nav>
+          ))}
 
-        {/* Mobile menu button */}
-        <button
-          className="rounded-md p-2 text-stone-600 hover:bg-stone-100 md:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label="Menü öffnen"
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Mobile nav */}
-      {open && (
-        <div className="border-t border-stone-100 bg-white px-4 pb-4 pt-2 md:hidden">
-          <nav className="flex flex-col gap-1">
-            {navLinks}
-
+          <div className="ml-3 flex items-center gap-1.5 border-l border-border pl-3">
             {user ? (
               <>
                 <Link
-                  href="/profil"
-                  className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100"
-                  onClick={() => setOpen(false)}
+                  href="/nachrichten"
+                  className="rounded-md p-1.5 text-muted transition-colors hover:bg-zinc-100 hover:text-foreground"
+                  title="Nachrichten"
                 >
-                  <User size={15} />
-                  Mein Profil
+                  <MessageSquare size={16} />
+                </Link>
+                <Link
+                  href="/profil"
+                  className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:bg-zinc-100 hover:text-foreground"
+                >
+                  <User size={14} />
+                  <span className="max-w-[100px] truncate">{user.email?.split('@')[0]}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-stone-500 hover:bg-stone-100"
+                  className="rounded-md p-1.5 text-muted transition-colors hover:bg-zinc-100 hover:text-foreground"
+                  title="Abmelden"
                 >
                   <LogOut size={15} />
-                  Abmelden
                 </button>
               </>
             ) : (
               <Link
                 href="/login"
-                className="mt-1 rounded-md bg-accent px-3 py-2.5 text-center text-sm font-medium text-white"
+                className="rounded-md bg-accent px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              >
+                {t('login')}
+              </Link>
+            )}
+          </div>
+        </nav>
+
+        {/* Mobile toggle */}
+        <button
+          className="rounded-md p-1.5 text-muted hover:bg-zinc-100 md:hidden"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={18} /> : <Menu size={18} />}
+        </button>
+      </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="border-t border-border bg-surface px-4 pb-4 pt-2 md:hidden">
+          <nav className="flex flex-col gap-0.5">
+            {links.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="rounded-md px-3 py-2.5 text-sm text-foreground hover:bg-zinc-100"
                 onClick={() => setOpen(false)}
               >
+                {label}
+              </Link>
+            ))}
+            <div className="my-1 border-t border-border" />
+            {user ? (
+              <>
+                <Link href="/nachrichten" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-foreground hover:bg-zinc-100" onClick={() => setOpen(false)}>
+                  <MessageSquare size={14} /> Nachrichten
+                </Link>
+                <Link href="/profil" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-foreground hover:bg-zinc-100" onClick={() => setOpen(false)}>
+                  <User size={14} /> Mein Profil
+                </Link>
+                <button onClick={handleLogout} className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-muted hover:bg-zinc-100">
+                  <LogOut size={14} /> Abmelden
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="mt-1 rounded-md bg-accent px-3 py-2.5 text-center text-sm font-medium text-white" onClick={() => setOpen(false)}>
                 {t('login')}
               </Link>
             )}

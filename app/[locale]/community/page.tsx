@@ -75,7 +75,7 @@ export default async function CommunityPage({
       </div>
 
       {/* Org channel tabs */}
-      <div className="mb-6 flex gap-2 flex-wrap">
+      <div className="mb-6 flex gap-1.5 flex-wrap">
         {[
           { label: 'Alle', value: null },
           { label: 'HEC Paris', value: 'hec' },
@@ -87,10 +87,10 @@ export default async function CommunityPage({
             <a
               key={label}
               href={href}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-accent text-white'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  ? 'border-foreground bg-accent text-white'
+                  : 'border-border bg-surface text-muted hover:border-zinc-400 hover:text-foreground'
               }`}
             >
               {label}
