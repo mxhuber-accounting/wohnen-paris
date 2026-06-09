@@ -43,3 +43,20 @@ body {
 .marquee-pause:hover .animate-marquee {
   animation-play-state: paused;
 }
+
+/* Leaflet tooltip overrides for loyer map */
+.loyer-tooltip {
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1) !important;
+  white-space: nowrap;
+}
+.loyer-tooltip--active {
+  background: #fff !important;
+  color: #18181b !important;
+}
+.loyer-tooltip--muted {
+  background: #f4f4f5 !important;
+  color: #71717a !important;
+}
