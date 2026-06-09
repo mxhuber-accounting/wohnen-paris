@@ -14,6 +14,10 @@ type Props = {
   defaultPieces?: number;
   defaultMeuble?: boolean;
   onClose: () => void;
+  /** When true, renders as a flex-1 block instead of fixed fullscreen overlay */
+  inline?: boolean;
+  /** Optional extra controls to render in the header (e.g. city selector) */
+  headerExtra?: React.ReactNode;
 };
 
 function lerp(t: number): string {
@@ -41,6 +45,8 @@ export default function ReferenceRentMap({
   defaultPieces = 2,
   defaultMeuble = true,
   onClose,
+  inline = false,
+  headerExtra,
 }: Props) {
   const [pieces, setPieces] = useState(defaultPieces);
   const [meuble, setMeuble] = useState(defaultMeuble);
@@ -82,13 +88,16 @@ export default function ReferenceRentMap({
   const selRows = selected ? (data.byZone[selected.zone] ?? []) : [];
 
   return (
-    <div className="fixed inset-0 z-[9000] flex flex-col bg-white">
+    <div className={inline ? 'flex h-full flex-col bg-white' : 'fixed inset-0 z-[9000] flex flex-col bg-white'}>
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-white px-4 py-3">
-        <div>
-          <h2 className="font-serif text-base font-semibold text-foreground">
-            Encadrement des loyers — {cfg.label}
-          </h2>
-          <p className="text-xs text-muted">DRIHL · data.gouv.fr · {data.year}</p>
+        <div className="flex items-center gap-3">
+          {headerExtra}
+          <div>
+            <h2 className="font-serif text-base font-semibold text-foreground">
+              Encadrement des loyers — {cfg.label}
+            </h2>
+            <p className="text-xs text-muted">DRIHL · data.gouv.fr · {data.year}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex overflow-hidden rounded-lg border border-border text-xs">
