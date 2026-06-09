@@ -1,14 +1,9 @@
 {
   "auth": {
     "pageTitle": "Anmelden",
-    "title": "Willkommen zurück",
-    "subtitle": "Gib deine E-Mail-Adresse ein — wir schicken dir einen Anmeldelink.",
+    "title": "Willkommen",
+    "subtitle": "Melde dich an oder erstelle ein Konto mit deiner Uni-E-Mail.",
     "emailLabel": "E-Mail-Adresse",
-    "submit": "Magic Link senden",
-    "sending": "Wird gesendet…",
-    "noPassword": "Kein Passwort nötig.",
-    "sentTitle": "Link verschickt!",
-    "sentDesc": "Wir haben einen Anmeldelink an {email} geschickt. Schau in dein Postfach.",
     "linkExpired": "Dieser Link ist abgelaufen oder ungültig. Bitte versuch es nochmal.",
     "error": "Etwas ist schiefgelaufen. Bitte versuch es nochmal."
   },

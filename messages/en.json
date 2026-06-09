@@ -1,14 +1,9 @@
 {
   "auth": {
     "pageTitle": "Log in",
-    "title": "Welcome back",
-    "subtitle": "Enter your email address and we'll send you a login link.",
+    "title": "Welcome",
+    "subtitle": "Log in or create an account with your university email.",
     "emailLabel": "Email address",
-    "submit": "Send magic link",
-    "sending": "Sending…",
-    "noPassword": "No password needed.",
-    "sentTitle": "Link sent!",
-    "sentDesc": "We sent a login link to {email}. Check your inbox.",
     "linkExpired": "This link has expired or is invalid. Please try again.",
     "error": "Something went wrong. Please try again."
   },
