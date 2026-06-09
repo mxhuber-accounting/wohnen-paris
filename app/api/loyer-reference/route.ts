@@ -3,7 +3,6 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { LoyerData, RentRow } from '@/lib/loyer-types';
 
-const DATASET_ID = '62a7243912f22dbff558476d';
 
 function parseCsv(text: string): Record<string, string>[] {
   const sep = text.split('\n')[0].includes(';') ? ';' : ',';
@@ -21,25 +20,13 @@ function toNum(s: string) {
 
 export async function GET() {
   try {
-    // GeoJSON is bundled statically — no external fetch needed
+    // Both files bundled statically — no external fetches at runtime
     const geoJson = JSON.parse(
       readFileSync(join(process.cwd(), 'public', 'paris-arrondissements.geojson'), 'utf-8')
     );
-
-    const metaRes = await fetch(`https://www.data.gouv.fr/api/1/datasets/${DATASET_ID}/`);
-    if (!metaRes.ok) throw new Error(`data.gouv.fr: ${metaRes.status}`);
-    const meta = await metaRes.json();
-
-    const resources: any[] = meta.resources ?? [];
-    const csv = resources
-      .filter(r => (r.format ?? '').toLowerCase() === 'csv')
-      .sort((a, b) => new Date(b.last_modified ?? 0).getTime() - new Date(a.last_modified ?? 0).getTime())[0];
-
-    if (!csv?.url) throw new Error('No CSV found in dataset');
-
-    const csvRes = await fetch(csv.url);
-    if (!csvRes.ok) throw new Error(`CSV: ${csvRes.status}`);
-    const rows = parseCsv(await csvRes.text());
+    const rows = parseCsv(
+      readFileSync(join(process.cwd(), 'public', 'paris-loyers.csv'), 'utf-8')
+    );
 
     const byArrondissement: Record<number, RentRow[]> = {};
 
@@ -65,7 +52,7 @@ export async function GET() {
       });
     }
 
-    const year = new Date(csv.last_modified ?? Date.now()).getFullYear();
+    const year = 2022;
     const data: LoyerData = { geoJson, byArrondissement, year };
 
     return NextResponse.json(data, {
