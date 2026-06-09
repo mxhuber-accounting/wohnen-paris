@@ -42,7 +42,15 @@ export default async function PublicProfilePage({
     .eq('id', id)
     .single();
 
-  if (!profile) notFound();
+  if (!profile) {
+    // If it's the logged-in user's own profile, send them to the edit page
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser?.id === id) {
+      const { redirect } = await import('next/navigation');
+      redirect('/profil');
+    }
+    notFound();
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   const isLoggedIn = !!user;
