@@ -27,14 +27,31 @@ function avgRef(rows: RentRow[], pieces: number, meuble: boolean) {
 
 export default function LoyerReference({ arrondissement, rooms, furnished, kaltmiete, sizeSqm }: Props) {
   const [data, setData] = useState<LoyerData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     fetch('/api/loyer-reference')
       .then(r => r.json())
-      .then(setData)
-      .catch(() => {});
+      .then(d => { if (d.error) setError(d.error); else setData(d); setLoading(false); })
+      .catch(e => { setError(e.message); setLoading(false); });
   }, []);
+
+  if (loading) return (
+    <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
+      <div className="h-3 w-40 animate-pulse rounded bg-border" />
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {[0,1,2].map(i => <div key={i} className="h-16 animate-pulse rounded-xl bg-border" />)}
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="mt-6 rounded-2xl border border-border bg-surface p-5 text-xs text-muted">
+      Loyer de référence konnte nicht geladen werden: {error}
+    </div>
+  );
 
   if (!data) return null;
 

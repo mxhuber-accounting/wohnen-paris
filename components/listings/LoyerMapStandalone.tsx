@@ -13,12 +13,12 @@ export default function LoyerMapStandalone() {
 
   useEffect(() => {
     fetch('/api/loyer-reference')
-      .then(r => r.json())
-      .then(d => {
+      .then(async r => {
+        const d = await r.json();
         if (d.error) setError(d.error);
         else setData(d);
       })
-      .catch(e => setError(e.message));
+      .catch(e => setError(String(e)));
   }, []);
 
   if (error) {

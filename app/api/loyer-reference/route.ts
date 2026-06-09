@@ -17,9 +17,12 @@ function toNum(s: string) {
 }
 
 const fetchLoyerData = unstable_cache(async (): Promise<LoyerData> => {
+  // Dataset ID: "Encadrement des loyers de Paris" on data.gouv.fr
+  const DATASET_ID = '62a7243912f22dbff558476d';
+
   const [geoRes, metaRes] = await Promise.all([
     fetch('https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/arrondissements/exports/geojson?lang=fr'),
-    fetch('https://www.data.gouv.fr/api/1/datasets/lencadrement-des-loyers-a-paris/'),
+    fetch(`https://www.data.gouv.fr/api/1/datasets/${DATASET_ID}/`),
   ]);
 
   if (!geoRes.ok) throw new Error(`GeoJSON: ${geoRes.status}`);
@@ -69,9 +72,9 @@ const fetchLoyerData = unstable_cache(async (): Promise<LoyerData> => {
       pieces,
       meuble,
       epoque: row['epoque'] ?? '',
-      ref: toNum(row['ref'] ?? row['loyer_ref'] ?? ''),
-      ref_maj: toNum(row['ref_max'] ?? row['ref_maj'] ?? row['loyer_ref_maj'] ?? ''),
-      ref_min: toNum(row['ref_min'] ?? row['loyer_ref_min'] ?? ''),
+      ref:     toNum(row['ref'] ?? ''),
+      ref_maj: toNum(row['max'] ?? row['ref_max'] ?? row['ref_maj'] ?? ''),
+      ref_min: toNum(row['min'] ?? row['ref_min'] ?? ''),
     });
   }
 
