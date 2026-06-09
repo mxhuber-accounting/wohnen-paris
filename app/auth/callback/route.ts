@@ -40,34 +40,14 @@ export async function GET(request: Request) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
 
+      // Stamp org on profile if email matches a known school domain.
+      // Domain restriction is currently disabled — all emails are allowed.
       if (user?.email) {
         const org = getOrgFromEmail(user.email);
-
         if (org) {
-          // Verified student — stamp org + user_type on their profile
           await supabase
             .from('profiles')
             .update({ organization: org, user_type: 'student' })
-            .eq('id', user.id);
-        } else {
-          // Not a whitelisted school domain — check for approved landlord
-          const { data: approved } = await supabase
-            .from('access_requests')
-            .select('id')
-            .eq('email', user.email.toLowerCase())
-            .eq('status', 'approved')
-            .maybeSingle();
-
-          if (!approved) {
-            // Neither student nor approved — revoke session
-            await supabase.auth.signOut();
-            return NextResponse.redirect(`${origin}/login?error=not_approved`);
-          }
-
-          // Approved landlord
-          await supabase
-            .from('profiles')
-            .update({ user_type: 'landlord' })
             .eq('id', user.id);
         }
       }
