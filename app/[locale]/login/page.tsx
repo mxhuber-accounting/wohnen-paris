@@ -22,9 +22,11 @@ export default async function LoginPage({
           <p className="mt-2 text-sm text-stone-500">{t('subtitle')}</p>
         </div>
 
-        {error === 'auth' && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {t('linkExpired')}
+        {(error === 'auth' || error === 'otp_expired' || error === 'access_denied') && (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {error === 'otp_expired' || error === 'access_denied'
+              ? t('linkExpired')
+              : t('error')}
           </div>
         )}
 
