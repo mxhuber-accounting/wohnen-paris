@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Send } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { Send, Mail } from 'lucide-react';
 
 export type CommunityPost = {
   id: string;
@@ -39,13 +40,13 @@ function avatarColor(userId: string) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function PostCard({ post }: { post: CommunityPost }) {
+function PostCard({ post, currentUserId }: { post: CommunityPost; currentUserId: string }) {
   const initial = (post.display_name ?? 'A')[0].toUpperCase();
   return (
     <div className="flex gap-3 border-b border-border bg-surface px-5 py-4 last:border-b-0">
-      <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-foreground ${avatarColor(post.user_id)}`}>
+      <a href={`/profil/${post.user_id}`} className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-foreground transition-opacity hover:opacity-70 ${avatarColor(post.user_id)}`}>
         {initial}
-      </div>
+      </a>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <a href={`/profil/${post.user_id}`} className="text-sm font-semibold text-foreground hover:underline">
@@ -64,6 +65,14 @@ function PostCard({ post }: { post: CommunityPost }) {
           <span className="ml-auto shrink-0 text-xs text-muted">{relativeTime(post.created_at)}</span>
         </div>
         <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-foreground">{post.body}</p>
+        {post.user_id !== currentUserId && (
+          <Link
+            href={`/nachrichten/${post.user_id}` as any}
+            className="mt-2 inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
+          >
+            <Mail size={11} /> Anschreiben
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -193,7 +202,7 @@ export default function CommunityFeed({
         <p className="py-16 text-center text-sm text-muted">Noch keine Nachrichten. Sei der Erste!</p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-border">
-          {posts.map((post) => <PostCard key={post.id} post={post} />)}
+          {posts.map((post) => <PostCard key={post.id} post={post} currentUserId={currentUser.id} />)}
         </div>
       )}
     </div>
