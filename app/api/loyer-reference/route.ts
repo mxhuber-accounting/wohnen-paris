@@ -1,26 +1,21 @@
 import { NextResponse } from 'next/server';
+import { PARIS_LOYERS } from '@/lib/data/paris-loyers-data';
 import type { RentRow } from '@/lib/loyer-types';
 
-// Pre-parsed rent data — bundled at build time, no external fetches
-const RAW: { id_zone: number; piece: number; epoque: string; min: number; ref: number; max: number; meuble: boolean }[] =
-  // @ts-ignore — generated from paris-loyers.csv
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('@/lib/data/paris-loyers.json');
-
+// [id_zone, piece, epoque, min, ref, max, meuble(1/0)]
 export async function GET() {
   const byArrondissement: Record<number, RentRow[]> = {};
 
-  for (const row of RAW) {
-    const arr = row.id_zone;
+  for (const [arr, piece, epoque, min, ref, max, meuble] of PARIS_LOYERS) {
     if (arr < 1 || arr > 20) continue;
     byArrondissement[arr] ??= [];
     byArrondissement[arr].push({
-      pieces:  row.piece,
-      meuble:  row.meuble,
-      epoque:  row.epoque,
-      ref:     row.ref,
-      ref_maj: row.max,
-      ref_min: row.min,
+      pieces:  piece,
+      meuble:  meuble === 1,
+      epoque:  epoque as string,
+      ref,
+      ref_maj: max,
+      ref_min: min,
     });
   }
 
