@@ -17,63 +17,66 @@ export default async function FeedPage() {
 
   if (!user) redirect('/login');
 
+  // ── Step 1: fetch raw rows (no profile join — FKs point to auth.users, not profiles)
   const [
-    { data: profile },
+    { data: myProfile },
     { data: cities },
     { data: rawListings },
     { data: rawPosts },
     { data: rawGesuche },
   ] = await Promise.all([
     supabase.from('profiles').select('display_name, organization').eq('id', user.id).single(),
-
     supabase.from('cities').select('id, name, slug'),
-
     supabase
       .from('listings')
-      .select(`
-        id, type, title, kaltmiete, photos, arrondissement, quartier, created_at,
-        cities ( name ),
-        profiles!user_id ( id, display_name, organization )
-      `)
+      .select('id, type, title, kaltmiete, photos, arrondissement, quartier, city_id, user_id, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20),
-
     supabase
       .from('community_posts')
-      .select(`
-        id, body, user_id, created_at, organization,
-        cities ( name ),
-        profiles!user_id ( display_name )
-      `)
+      .select('id, body, user_id, city_id, organization, created_at')
       .order('created_at', { ascending: false })
       .limit(20),
-
     supabase
       .from('looking_posts')
-      .select(`
-        id, title, description, budget_max, rooms_min, available_from, created_at,
-        cities ( name ),
-        profiles!user_id ( id, display_name, organization )
-      `)
+      .select('id, title, description, budget_max, rooms_min, available_from, city_id, user_id, created_at')
       .order('created_at', { ascending: false })
       .limit(15),
   ]);
 
+  // ── Step 2: batch-fetch all needed profiles in one query
+  const allUserIds = Array.from(new Set([
+    ...(rawListings ?? []).map((l) => l.user_id),
+    ...(rawPosts ?? []).map((p) => p.user_id),
+    ...(rawGesuche ?? []).map((g) => g.user_id),
+  ])).filter(Boolean);
+
+  const { data: profiles } = allUserIds.length > 0
+    ? await supabase
+        .from('profiles')
+        .select('id, display_name, organization')
+        .in('id', allUserIds)
+    : { data: [] };
+
+  const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
+  const cityMap = Object.fromEntries((cities ?? []).map((c) => [c.id, c]));
+
+  // ── Step 3: assemble feed items
   const listingItems: FeedItem[] = (rawListings ?? []).map((l) => {
-    const p = l.profiles as unknown as { id: string; display_name: string | null; organization: string | null } | null;
-    const c = l.cities as unknown as { name: string } | null;
+    const p = profileMap[l.user_id];
+    const c = cityMap[l.city_id];
     return {
       kind: 'listing',
       id: l.id,
       title: l.title,
       type: l.type,
       kaltmiete: l.kaltmiete,
-      photos: l.photos ?? [],
+      photos: (l.photos as string[]) ?? [],
       arrondissement: l.arrondissement,
       quartier: l.quartier,
       city_name: c?.name ?? null,
-      poster_id: p?.id ?? user.id,
+      poster_id: l.user_id,
       poster_name: p?.display_name ?? null,
       poster_org: p?.organization ?? null,
       created_at: l.created_at,
@@ -81,23 +84,23 @@ export default async function FeedPage() {
   });
 
   const postItems: FeedItem[] = (rawPosts ?? []).map((p) => {
-    const profile = p.profiles as unknown as { display_name: string | null } | null;
-    const city = p.cities as unknown as { name: string } | null;
+    const prof = profileMap[p.user_id];
+    const c = cityMap[p.city_id];
     return {
       kind: 'post',
       id: p.id,
       body: p.body,
       user_id: p.user_id,
-      display_name: profile?.display_name ?? 'Mitglied',
-      city_name: city?.name ?? null,
+      display_name: prof?.display_name ?? 'Mitglied',
+      city_name: c?.name ?? null,
       organization: p.organization,
       created_at: p.created_at,
     };
   });
 
   const gesuchItems: FeedItem[] = (rawGesuche ?? []).map((g) => {
-    const p = g.profiles as unknown as { id: string; display_name: string | null; organization: string | null } | null;
-    const c = g.cities as unknown as { name: string } | null;
+    const p = profileMap[g.user_id];
+    const c = cityMap[g.city_id];
     return {
       kind: 'gesuch',
       id: g.id,
@@ -107,7 +110,7 @@ export default async function FeedPage() {
       rooms_min: g.rooms_min,
       available_from: g.available_from,
       city_name: c?.name ?? null,
-      user_id: p?.id ?? user.id,
+      user_id: g.user_id,
       poster_name: p?.display_name ?? null,
       poster_org: p?.organization ?? null,
       created_at: g.created_at,
@@ -118,13 +121,13 @@ export default async function FeedPage() {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  const firstName = profile?.display_name?.split(' ')[0] ?? 'Hallo';
-  const userOrg = profile?.organization;
+  const firstName = myProfile?.display_name?.split(' ')[0] ?? 'Hallo';
+  const userOrg = myProfile?.organization;
   const schools = Object.keys(ORG_LABEL).filter((k) => k !== 'other');
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">
             Willkommen zurück, {firstName}
@@ -149,7 +152,6 @@ export default async function FeedPage() {
         {/* Sidebar */}
         <aside className="space-y-5">
 
-          {/* Mobile: live count */}
           <div className="sm:hidden">
             <LiveUserCount />
           </div>
@@ -191,9 +193,7 @@ export default async function FeedPage() {
 
           {/* School communities */}
           <div className="rounded-2xl border border-border bg-surface p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted">Communities</p>
-            </div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted">Communities</p>
             <div className="space-y-2">
               {schools.map((org) => (
                 <Link

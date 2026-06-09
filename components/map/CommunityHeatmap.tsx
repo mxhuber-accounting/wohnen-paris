@@ -31,6 +31,8 @@ const ALL_ORGS = Object.keys(ORG_LABEL);
 
 function buildGlowIcon(size: number, color: string, label: string): L.DivIcon {
   const half = Math.round(size / 2);
+  const dotSize = Math.round(size * 0.38);
+  const dotInset = Math.round((size - dotSize) / 2);
   return L.divIcon({
     html: `
       <div style="
@@ -41,19 +43,21 @@ function buildGlowIcon(size: number, color: string, label: string): L.DivIcon {
       ">
         <div style="
           position: absolute; inset: 0; border-radius: 50%;
-          background: radial-gradient(circle, ${color}ee 0%, ${color}88 35%, ${color}33 60%, transparent 80%);
-          filter: blur(3px);
+          background: radial-gradient(circle, ${color}55 0%, ${color}22 50%, transparent 75%);
+          filter: blur(1px);
         "></div>
         <div style="
-          position: absolute; inset: ${Math.round(size * 0.3)}px;
+          position: absolute;
+          top: ${dotInset}px; left: ${dotInset}px;
+          width: ${dotSize}px; height: ${dotSize}px;
           border-radius: 50%;
-          background: ${color};
-          box-shadow: 0 0 ${Math.round(size * 0.4)}px ${color}cc;
+          background: ${color}dd;
+          box-shadow: 0 0 6px ${color}88;
           display: flex; align-items: center; justify-content: center;
         ">
           <span style="
-            color: white; font-size: ${Math.max(9, Math.round(size * 0.18))}px;
-            font-weight: 700; white-space: nowrap;
+            color: white; font-size: ${Math.max(8, Math.round(dotSize * 0.38))}px;
+            font-weight: 700; line-height: 1;
           ">${label}</span>
         </div>
       </div>
@@ -89,7 +93,7 @@ function CityMarkers({
 
       const color = filterOrg ? (ORG_HEX[filterOrg] ?? '#7c3aed') : '#a78bfa';
       const maxCount = Math.max(...cities.map((c) => c.total), 1);
-      const size = Math.round(40 + (count / maxCount) * 80);
+      const size = Math.round(28 + (count / maxCount) * 28);
 
       const icon = buildGlowIcon(size, color, String(count));
       const marker = L.marker([city.lat, city.lng], { icon }).addTo(map);
@@ -209,19 +213,19 @@ export default function CommunityHeatmap({ cities }: { cities: CityStats[] }) {
       {/* Legend */}
       <div className="absolute bottom-6 right-4 z-[1000] rounded-xl bg-black/60 px-4 py-3 backdrop-blur-sm text-xs text-white/60">
         <p className="mb-1 font-semibold text-white/80">Aktivität</p>
-        <div className="flex items-end gap-2">
-          {[20, 40, 70].map((s) => (
+        <div className="flex items-end gap-3">
+          {[8, 14, 20].map((s, i) => (
             <div key={s} className="flex flex-col items-center gap-1">
               <div
                 style={{
-                  width: s / 3,
-                  height: s / 3,
+                  width: s,
+                  height: s,
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, #a78bfa88 0%, #a78bfa22 70%)',
-                  boxShadow: '0 0 8px #a78bfa66',
+                  background: '#a78bfacc',
+                  boxShadow: '0 0 4px #a78bfa66',
                 }}
               />
-              <span>{s === 20 ? 'wenig' : s === 70 ? 'viel' : ''}</span>
+              <span>{i === 0 ? 'wenig' : i === 2 ? 'viel' : ''}</span>
             </div>
           ))}
         </div>
