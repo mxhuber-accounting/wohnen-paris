@@ -6,6 +6,7 @@ import FaqAccordion from '@/components/landing/FaqAccordion';
 import PartnersBanner from '@/components/landing/PartnersBanner';
 import { SCHOOL_DOMAINS } from '@/lib/auth/allowed-domains';
 import { ORG_LABEL, ORG_EMOJI, ORG_COLOR } from '@/lib/orgs';
+import LiveUserCountStat from '@/components/ui/LiveUserCountStat';
 
 const COMING_SOON_ORGS = ['essec', 'sciencespo', 'lbs', 'lse', 'escp', 'insead', 'ucl', 'imperial'];
 
@@ -66,17 +67,23 @@ export default async function LandingPage() {
 
       {/* Stats */}
       <section className="border-b border-border bg-background px-4 py-10 sm:px-6">
-        <div className="mx-auto grid max-w-3xl grid-cols-3 divide-x divide-border text-center">
+        <div className="mx-auto grid max-w-3xl grid-cols-2 divide-x divide-y divide-border text-center sm:grid-cols-4 sm:divide-y-0">
           {[
             { value: `${totalListings ?? 0}+`, label: t('stats.listings') },
             { value: '2', label: t('stats.cities') },
             { value: '0 €', label: t('stats.free') },
           ].map(({ value, label }) => (
-            <div key={label} className="px-4 py-2">
+            <div key={label} className="px-4 py-4">
               <p className="font-serif text-3xl font-semibold text-foreground">{value}</p>
               <p className="mt-1 text-xs text-muted">{label}</p>
             </div>
           ))}
+          <div className="px-4 py-4">
+            <div className="flex justify-center">
+              <LiveUserCountStat />
+            </div>
+            <p className="mt-1 text-xs text-muted">gerade online</p>
+          </div>
         </div>
       </section>
 
