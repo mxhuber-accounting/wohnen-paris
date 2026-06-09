@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { ImagePlus, X } from 'lucide-react';
 
 const LISTING_TYPES = ['ganze_wohnung', 'wg_zimmer', 'zwischenmiete'] as const;
 
@@ -19,6 +20,10 @@ export default function CreateListingForm({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     type: 'ganze_wohnung' as (typeof LISTING_TYPES)[number],
@@ -40,12 +45,45 @@ export default function CreateListingForm({
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, 8 - photos.length);
+    setPhotos((prev) => [...prev, ...files].slice(0, 8));
+    files.forEach((f) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => setPhotoPreviews((prev) => [...prev, ev.target?.result as string].slice(0, 8));
+      reader.readAsDataURL(f);
+    });
+    e.target.value = '';
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     const supabase = createClient();
+
+    // Upload photos first
+    const photoUrls: string[] = [];
+    if (photos.length > 0) {
+      setUploading(true);
+      for (const file of photos) {
+        const ext = file.name.split('.').pop();
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('listing-photos').upload(path, file);
+        if (!upErr) {
+          const { data: { publicUrl } } = supabase.storage.from('listing-photos').getPublicUrl(path);
+          photoUrls.push(publicUrl);
+        }
+      }
+      setUploading(false);
+    }
+
     const { data, error: err } = await supabase
       .from('listings')
       .insert({
@@ -64,6 +102,7 @@ export default function CreateListingForm({
         available_to: form.available_to || null,
         arrondissement: parseInt(form.arrondissement),
         quartier: form.quartier.trim() || null,
+        photos: photoUrls,
         status: 'active',
       })
       .select('id')
@@ -272,16 +311,52 @@ export default function CreateListingForm({
         </div>
       </div>
 
+      {/* Photos */}
+      <div>
+        <label className={labelClass}>Fotos <span className="font-normal text-muted">(bis zu 8)</span></label>
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handlePhotoSelect} />
+
+        {photoPreviews.length > 0 && (
+          <div className="mt-2 grid grid-cols-4 gap-2">
+            {photoPreviews.map((src, i) => (
+              <div key={i} className="relative aspect-square">
+                <img src={src} alt="" className="h-full w-full rounded-lg object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-white hover:bg-red-600"
+                >
+                  <X size={10} />
+                </button>
+                {i === 0 && (
+                  <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-semibold text-white">Titelbild</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {photos.length < 8 && (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-4 text-sm text-muted hover:border-foreground hover:text-foreground"
+          >
+            <ImagePlus size={15} /> Foto hinzufügen
+          </button>
+        )}
+      </div>
+
       {error && (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || uploading}
         className="w-full rounded-lg bg-accent px-6 py-3.5 text-base font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-60"
       >
-        {loading ? t('create.submitting') : t('create.submit')}
+        {uploading ? 'Fotos werden hochgeladen…' : loading ? t('create.submitting') : t('create.submit')}
       </button>
     </form>
   );

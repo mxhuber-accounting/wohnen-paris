@@ -3,7 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Link } from '@/i18n/navigation';
-import { Send, Mail, Plus, X, MessageSquare } from 'lucide-react';
+import { Send, Mail, Plus, X, MessageSquare, Home } from 'lucide-react';
+
+const LISTING_KEYWORDS = [
+  'vermiete', 'vermieten', 'zu vermieten', 'zimmer frei', 'wohnung frei',
+  'wg-zimmer', 'wg zimmer', 'untervermiete', 'untermiete', 'zwischenmiete',
+  'available', 'for rent', 'room available', 'flat available',
+  'loue', 'sous-loue', 'chambre libre', 'appartement libre',
+];
+
+function detectsListing(text: string): boolean {
+  const lower = text.toLowerCase();
+  return LISTING_KEYWORDS.some((kw) => lower.includes(kw));
+}
 
 export type CommunityPost = {
   id: string;
@@ -121,6 +133,7 @@ export default function CommunityFeed({
   const [body, setBody] = useState('');
   const [postOrg, setPostOrg] = useState<string>(activeOrg ?? '');
   const [sending, setSending] = useState(false);
+  const [listingPrompt, setListingPrompt] = useState(false);
   const [showCreateChannel, setShowCreateChannel] = useState(false);
   const [channelName, setChannelName] = useState('');
   const [channelDesc, setChannelDesc] = useState('');
@@ -177,7 +190,9 @@ export default function CommunityFeed({
     };
 
     setPosts((prev) => [optimistic, ...prev]);
+    const detectedListing = detectsListing(body.trim());
     setBody('');
+    setListingPrompt(detectedListing);
     textareaRef.current?.focus();
 
     await supabase.from('community_posts').insert({
@@ -321,6 +336,22 @@ export default function CommunityFeed({
         </div>
         <p className="mt-2 text-xs text-muted">Enter senden · Shift+Enter Zeilenumbruch</p>
       </div>
+
+      {/* Listing detection prompt */}
+      {listingPrompt && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            <Home size={15} className="shrink-0 text-blue-700" />
+            <p className="text-sm text-blue-800">
+              Klingt nach einem Wohnungsangebot!{' '}
+              <a href="/anzeige-aufgeben" className="font-semibold underline">Anzeige aufgeben →</a>
+            </p>
+          </div>
+          <button type="button" onClick={() => setListingPrompt(false)} className="text-blue-400 hover:text-blue-700">
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Feed */}
       {posts.length === 0 ? (

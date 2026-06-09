@@ -41,7 +41,7 @@ export default async function ListingDetailPage({
       kaltmiete, nebenkosten, kaution,
       size_sqm, rooms, furnished,
       available_from, available_to,
-      arrondissement, quartier,
+      arrondissement, quartier, photos,
       status, created_at, user_id
     `)
     .eq('id', id)
@@ -99,6 +99,27 @@ export default async function ListingDetailPage({
       >
         <ArrowLeft size={14} /> {t('detail.back')}
       </Link>
+
+      {/* ── Photo gallery ───────────────────────────────────────────────────── */}
+      {listing.photos && listing.photos.length > 0 && (
+        <div className="mb-6 overflow-hidden rounded-2xl">
+          {listing.photos.length === 1 ? (
+            <img src={listing.photos[0]} alt={listing.title} className="aspect-[16/9] w-full object-cover" />
+          ) : (
+            <div className="grid gap-1.5" style={{ gridTemplateColumns: listing.photos.length >= 3 ? '2fr 1fr' : '1fr 1fr' }}>
+              <img src={listing.photos[0]} alt="" className="aspect-[4/3] w-full rounded-l-2xl object-cover" />
+              <div className={`grid gap-1.5 ${listing.photos.length >= 4 ? 'grid-rows-2' : 'grid-rows-1'}`}>
+                {listing.photos.slice(1, listing.photos.length >= 4 ? 3 : 2).map((src: string, i: number) => (
+                  <img key={i} src={src} alt=""
+                    className={`w-full object-cover ${i === 0 && listing.photos.length >= 3 ? 'rounded-tr-2xl' : ''} ${i === 1 || listing.photos.length < 3 ? 'rounded-br-2xl' : ''}`}
+                    style={{ aspectRatio: listing.photos.length >= 4 ? 'auto' : '4/3', height: listing.photos.length >= 4 ? '100%' : undefined }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Main listing card ───────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">

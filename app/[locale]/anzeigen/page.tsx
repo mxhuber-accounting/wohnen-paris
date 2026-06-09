@@ -4,6 +4,7 @@ import ListingCard, { type Listing } from '@/components/listings/ListingCard';
 import BrowseFilters, { type FilterParams } from '@/components/listings/BrowseFilters';
 import type { MapListing } from '@/components/listings/ListingMap';
 import MapWrapper from '@/components/listings/MapWrapper';
+import LiveUserCount from '@/components/ui/LiveUserCount';
 
 export async function generateMetadata() {
   const t = await getTranslations('listings');
@@ -24,7 +25,7 @@ export default async function BrowsePage({
     .select(`
       id, type, title, kaltmiete, nebenkosten, size_sqm, rooms,
       furnished, available_from, arrondissement, quartier, lat, lng,
-      user_id, cities!city_id ( name )
+      user_id, photos, cities!city_id ( name )
     `)
     .eq('status', 'active')
     .order('created_at', { ascending: false });
@@ -82,12 +83,13 @@ export default async function BrowsePage({
       poster_id: r.user_id ?? null,
       poster_name: poster?.display_name ?? null,
       poster_org: poster?.organization ?? null,
+      photos: (r.photos as string[]) ?? [],
     };
   });
 
-  const mapListings: MapListing[] = listings.filter(
-    (l): l is Listing & { lat: number; lng: number } => l.lat != null && l.lng != null,
-  );
+  const mapListings: MapListing[] = listings
+    .filter((l): l is Listing & { lat: number; lng: number } => l.lat != null && l.lng != null)
+    .map((l) => ({ ...l, photos: l.photos ?? [] }));
 
   const count = listings.length;
 
@@ -98,6 +100,9 @@ export default async function BrowsePage({
           <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">
             {t('pageTitle')}
           </h1>
+          <div className="mt-1">
+            <LiveUserCount />
+          </div>
         </div>
         {count > 0 && (
           <p className="shrink-0 text-sm text-muted">

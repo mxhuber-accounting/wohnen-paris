@@ -21,6 +21,7 @@ export type Listing = {
   poster_name?: string | null;
   poster_id?: string | null;
   poster_org?: string | null;
+  photos?: string[];
 };
 
 const TYPE_BADGE: Record<Listing['type'], string> = {
@@ -59,11 +60,28 @@ export default function ListingCard({ listing }: { listing: Listing }) {
       ? `${listing.arrondissement}. Arr.${listing.quartier ? ` · ${listing.quartier}` : ''}`
       : (listing.quartier ?? '');
 
+  const coverPhoto = listing.photos?.[0];
+
   return (
     <Link
       href={`/anzeigen/${listing.id}`}
-      className="group flex flex-col rounded-xl border border-border bg-surface transition-all hover:border-zinc-300 hover:shadow-sm"
+      className="group flex flex-col rounded-xl border border-border bg-surface transition-all hover:border-zinc-300 hover:shadow-sm overflow-hidden"
     >
+      {/* Cover photo */}
+      {coverPhoto ? (
+        <div className="aspect-[4/3] w-full overflow-hidden bg-zinc-100">
+          <img
+            src={coverPhoto}
+            alt={listing.title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+      ) : (
+        <div className="aspect-[4/3] w-full bg-gradient-to-br from-zinc-100 to-zinc-50 flex items-center justify-center">
+          <span className="text-3xl text-zinc-300">🏠</span>
+        </div>
+      )}
+
       {/* Main content */}
       <div className="p-5">
         <div className="mb-3 flex items-start justify-between gap-2">
