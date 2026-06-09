@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowLeft, MessageSquare, MapPin, Calendar, Sofa, Layers } from 'lucide-react';
 import AreaTipsSection from '@/components/listings/AreaTipsSection';
+import LoyerReference from '@/components/listings/LoyerReference';
 import { ORG_LABEL, ORG_COLOR } from '@/lib/orgs';
 
 const TYPE_BADGE: Record<string, string> = {
@@ -218,6 +219,17 @@ export default async function ListingDetailPage({
           )}
         </div>
       </div>
+
+      {/* ── Loyer de référence ──────────────────────────────────────────────── */}
+      {listing.arrondissement != null && (
+        <LoyerReference
+          arrondissement={listing.arrondissement}
+          rooms={listing.rooms}
+          furnished={listing.furnished}
+          kaltmiete={listing.kaltmiete}
+          sizeSqm={listing.size_sqm}
+        />
+      )}
 
       {/* ── Poster profile card ─────────────────────────────────────────────── */}
       {poster && (
