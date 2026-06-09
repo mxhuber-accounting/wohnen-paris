@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
-import type { LoyerData, RentRow } from '@/lib/loyer-types';
-import geoJson from '@/lib/data/paris-arrondissements.json';
-import loyersRaw from '@/lib/data/paris-loyers.json';
+import type { RentRow } from '@/lib/loyer-types';
+
+// Pre-parsed rent data — bundled at build time, no external fetches
+const RAW: { id_zone: number; piece: number; epoque: string; min: number; ref: number; max: number; meuble: boolean }[] =
+  // @ts-ignore — generated from paris-loyers.csv
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/lib/data/paris-loyers.json');
 
 export async function GET() {
   const byArrondissement: Record<number, RentRow[]> = {};
 
-  for (const row of loyersRaw as any[]) {
-    const arr: number = row.id_zone;
+  for (const row of RAW) {
+    const arr = row.id_zone;
     if (arr < 1 || arr > 20) continue;
     byArrondissement[arr] ??= [];
     byArrondissement[arr].push({
@@ -20,6 +24,5 @@ export async function GET() {
     });
   }
 
-  const data: LoyerData = { geoJson, byArrondissement, year: 2022 };
-  return NextResponse.json(data);
+  return NextResponse.json({ byArrondissement, year: 2022 });
 }

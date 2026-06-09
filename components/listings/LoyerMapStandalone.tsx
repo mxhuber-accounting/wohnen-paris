@@ -12,16 +12,13 @@ export default function LoyerMapStandalone() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/loyer-reference')
-      .then(async r => {
-        const text = await r.text();
-        try {
-          const d = JSON.parse(text);
-          if (d.error) setError(d.error);
-          else setData(d);
-        } catch {
-          setError(`HTTP ${r.status} — ${text.slice(0, 300)}`);
-        }
+    Promise.all([
+      fetch('/api/loyer-reference').then(r => r.json()),
+      fetch('/paris-arrondissements.geojson').then(r => r.json()),
+    ])
+      .then(([rents, geoJson]) => {
+        if (rents.error) { setError(rents.error); return; }
+        setData({ ...rents, geoJson });
       })
       .catch(e => setError(String(e)));
   }, []);

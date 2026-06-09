@@ -32,9 +32,14 @@ export default function LoyerReference({ arrondissement, rooms, furnished, kaltm
   const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
-    fetch('/api/loyer-reference')
-      .then(r => r.json())
-      .then(d => { if (d.error) setError(d.error); else setData(d); setLoading(false); })
+    Promise.all([
+      fetch('/api/loyer-reference').then(r => r.json()),
+      fetch('/paris-arrondissements.geojson').then(r => r.json()),
+    ])
+      .then(([rents, geoJson]) => {
+        if (rents.error) { setError(rents.error); } else { setData({ ...rents, geoJson }); }
+        setLoading(false);
+      })
       .catch(e => { setError(e.message); setLoading(false); });
   }, []);
 

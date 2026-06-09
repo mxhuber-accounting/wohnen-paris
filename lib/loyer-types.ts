@@ -8,7 +8,7 @@ export type RentRow = {
 };
 
 export type LoyerData = {
-  geoJson: any;
+  geoJson: any; // fetched separately from /paris-arrondissements.geojson
   byArrondissement: Record<number, RentRow[]>;
   year: number;
 };
