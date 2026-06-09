@@ -1,31 +1,20 @@
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { ORG_LABEL, ORG_COLOR } from '@/lib/orgs';
+import { ORG_LABEL, ORG_COLOR, ORG_GRADIENT, ORG_EMOJI } from '@/lib/orgs';
 import { MessageSquare, Home, Users, ArrowLeft } from 'lucide-react';
 
-const ORG_HERO: Record<string, { emoji: string; tagline: string }> = {
-  hec:        { emoji: '🎓', tagline: 'Dein Raum als HEC-Student — Paris & London.' },
-  sciencespo: { emoji: '🏛️', tagline: 'Die Sciences Po Community für Wohnen im Ausland.' },
-  escp:       { emoji: '📊', tagline: 'ESCP-Studierende helfen ESCP-Studierenden.' },
-  insead:     { emoji: '🌐', tagline: 'Global denken. Lokal wohnen. INSEAD-Community.' },
-  lbs:        { emoji: '💼', tagline: 'LBS MBA & MiM — Wohnen in London & Paris.' },
-  lse:        { emoji: '📈', tagline: 'LSE-Studierende finden hier ihr Zuhause.' },
-  ucl:        { emoji: '🔬', tagline: 'UCL Community für internationale Studierende.' },
-  imperial:   { emoji: '⚙️', tagline: 'Imperial College — Wohnen & Netzwerken.' },
-  other:      { emoji: '🎯', tagline: 'Für alle internationalen Studierenden.' },
-};
-
-const ORG_GRADIENT: Record<string, string> = {
-  hec:        'from-purple-600 to-purple-800',
-  sciencespo: 'from-rose-600 to-rose-800',
-  escp:       'from-sky-600 to-sky-800',
-  insead:     'from-emerald-600 to-emerald-800',
-  lbs:        'from-slate-600 to-slate-800',
-  lse:        'from-red-600 to-red-800',
-  ucl:        'from-indigo-600 to-indigo-800',
-  imperial:   'from-zinc-700 to-zinc-900',
-  other:      'from-teal-600 to-teal-800',
+const ORG_TAGLINE: Record<string, string> = {
+  hec:        'Dein Raum als HEC-Student — Paris & London.',
+  essec:      'Die ESSEC-Community für Wohnen im Ausland.',
+  sciencespo: 'Die Sciences Po Community für Wohnen im Ausland.',
+  escp:       'ESCP-Studierende helfen ESCP-Studierenden.',
+  insead:     'Global denken. Lokal wohnen. INSEAD-Community.',
+  lbs:        'LBS MBA & MiM — Wohnen in London & Paris.',
+  lse:        'LSE-Studierende finden hier ihr Zuhause.',
+  ucl:        'UCL Community für internationale Studierende.',
+  imperial:   'Imperial College — Wohnen & Netzwerken.',
+  other:      'Für alle internationalen Studierenden.',
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -90,7 +79,8 @@ export default async function OrgCommunityPage({
       .limit(4),
   ]);
 
-  const hero = ORG_HERO[org] ?? { emoji: '🏫', tagline: 'Willkommen in deiner Community.' };
+  const heroEmoji = ORG_EMOJI[org] ?? '🏫';
+  const heroTagline = ORG_TAGLINE[org] ?? 'Willkommen in deiner Community.';
   const gradient = ORG_GRADIENT[org] ?? 'from-zinc-600 to-zinc-800';
   const memberCount = members?.length ?? 0;
 
@@ -106,12 +96,12 @@ export default async function OrgCommunityPage({
             <ArrowLeft size={14} /> Zurück zum Feed
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-5xl">{hero.emoji}</span>
+            <span className="text-5xl">{heroEmoji}</span>
             <div>
               <h1 className="font-serif text-3xl font-semibold text-white sm:text-4xl">
                 {ORG_LABEL[org]}
               </h1>
-              <p className="mt-1 text-white/70">{hero.tagline}</p>
+              <p className="mt-1 text-white/70">{heroTagline}</p>
             </div>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">

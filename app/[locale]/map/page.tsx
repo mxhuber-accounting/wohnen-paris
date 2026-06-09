@@ -15,83 +15,128 @@ const CITY_COORDS: Record<string, [number, number]> = {
   singapore: [1.3521, 103.8198],
   new_york:  [40.7128, -74.0060],
   hong_kong: [22.3193, 114.1694],
+  barcelona: [41.3851, 2.1734],
+  munich:    [48.1351, 11.5820],
+  vienna:    [48.2082, 16.3738],
+  stockholm: [59.3293, 18.0686],
+};
+
+type OrgCount = { org: string; count: number };
+type CityAgg = {
+  listings: Record<string, number>;
+  gesuche: Record<string, number>;
+  posts: Record<string, number>;
 };
 
 export default async function MapPage() {
   const supabase = await createClient();
 
-  // Fetch city slugs + names
-  const { data: citiesRaw } = await supabase
-    .from('cities')
-    .select('id, slug, name');
+  const [
+    { data: citiesRaw },
+    { data: listingRows },
+    { data: gesuchRows },
+    { data: postRows },
+  ] = await Promise.all([
+    supabase.from('cities').select('id, slug, name'),
+    supabase.from('listings').select('city_id, user_id').eq('status', 'active'),
+    supabase.from('looking_posts').select('city_id, user_id'),
+    supabase.from('community_posts').select('city_id, user_id, organization'),
+  ]);
 
-  // Fetch activity: count active listings per city per poster org
-  const { data: listingActivity } = await supabase
-    .from('listings')
-    .select('city_id, profiles!user_id ( organization )')
-    .eq('status', 'active');
+  // Batch-fetch all profiles in one query
+  const allUserIds = Array.from(new Set([
+    ...(listingRows ?? []).map((r) => r.user_id),
+    ...(gesuchRows ?? []).map((r) => r.user_id),
+    ...(postRows ?? []).map((r) => r.user_id),
+  ])).filter(Boolean);
 
-  // Fetch looking posts per city per org
-  const { data: gesuchActivity } = await supabase
-    .from('looking_posts')
-    .select('city_id, profiles!user_id ( organization )');
+  const { data: profiles } = allUserIds.length > 0
+    ? await supabase.from('profiles').select('id, organization').in('id', allUserIds)
+    : { data: [] };
 
-  // Fetch community posts per city per org
-  const { data: postActivity } = await supabase
-    .from('community_posts')
-    .select('city_id, organization');
-
+  const orgByUser = Object.fromEntries((profiles ?? []).map((p) => [p.id, p.organization ?? 'other']));
   const cityIdToSlug = Object.fromEntries((citiesRaw ?? []).map((c) => [c.id, c.slug]));
-  const cityIdToName = Object.fromEntries((citiesRaw ?? []).map((c) => [c.id, c.name]));
 
-  // Aggregate: citySlug → org → count
-  const stats: Record<string, Record<string, number>> = {};
+  // Aggregate per city per layer
+  const agg: Record<string, CityAgg> = {};
 
-  function tally(cityId: string | null, org: string | null | undefined) {
-    if (!cityId) return;
-    const slug = cityIdToSlug[cityId];
-    if (!slug) return;
-    const o = org ?? 'other';
-    stats[slug] ??= {};
-    stats[slug][o] = (stats[slug][o] ?? 0) + 1;
+  function init(slug: string) {
+    agg[slug] ??= { listings: {}, gesuche: {}, posts: {} };
+  }
+  function inc(slug: string, layer: keyof CityAgg, org: string) {
+    init(slug);
+    agg[slug][layer][org] = (agg[slug][layer][org] ?? 0) + 1;
   }
 
-  for (const row of listingActivity ?? []) {
-    const p = row.profiles as unknown as { organization: string | null } | null;
-    tally(row.city_id, p?.organization);
+  for (const row of listingRows ?? []) {
+    const slug = cityIdToSlug[row.city_id];
+    if (slug) inc(slug, 'listings', orgByUser[row.user_id] ?? 'other');
   }
-  for (const row of gesuchActivity ?? []) {
-    const p = row.profiles as unknown as { organization: string | null } | null;
-    tally(row.city_id, p?.organization);
+  for (const row of gesuchRows ?? []) {
+    const slug = cityIdToSlug[row.city_id];
+    if (slug) inc(slug, 'gesuche', orgByUser[row.user_id] ?? 'other');
   }
-  for (const row of postActivity ?? []) {
-    tally(row.city_id, row.organization);
+  for (const row of postRows ?? []) {
+    const slug = cityIdToSlug[row.city_id ?? ''];
+    if (slug) {
+      const org = row.organization ?? orgByUser[row.user_id] ?? 'other';
+      inc(slug, 'posts', org);
+    }
   }
 
-  const cityStats: CityStats[] = Object.entries(stats)
-    .map(([slug, orgMap]) => {
-      const [lat, lng] = CITY_COORDS[slug] ?? [0, 0];
-      const orgs = Object.entries(orgMap).map(([org, count]) => ({ org, count }));
-      const total = orgs.reduce((s, o) => s + o.count, 0);
-      const name = (citiesRaw ?? []).find((c) => c.slug === slug)?.name ?? slug;
-      return { slug, name, lat, lng, orgs, total };
-    })
-    .filter((c) => c.lat !== 0 && c.total > 0);
+  function toOrgCounts(map: Record<string, number>): OrgCount[] {
+    return Object.entries(map).map(([org, count]) => ({ org, count }));
+  }
 
-  // If no real data yet, show placeholder cities so the map looks good
+  const cityStats: CityStats[] = Object.entries(agg).map(([slug, data]) => {
+    const [lat, lng] = CITY_COORDS[slug] ?? [0, 0];
+    const name = (citiesRaw ?? []).find((c) => c.slug === slug)?.name ?? slug;
+
+    const listings = toOrgCounts(data.listings);
+    const gesuche = toOrgCounts(data.gesuche);
+    const posts = toOrgCounts(data.posts);
+    const listingsTotal = listings.reduce((s, o) => s + o.count, 0);
+    const gesucheTotal = gesuche.reduce((s, o) => s + o.count, 0);
+    const postsTotal = posts.reduce((s, o) => s + o.count, 0);
+
+    // Combined org totals for popup
+    const orgTotals: Record<string, number> = {};
+    for (const layer of [data.listings, data.gesuche, data.posts]) {
+      for (const [org, n] of Object.entries(layer)) {
+        orgTotals[org] = (orgTotals[org] ?? 0) + n;
+      }
+    }
+
+    return {
+      slug, name, lat, lng,
+      listings, listingsTotal,
+      gesuche, gesucheTotal,
+      posts, postsTotal,
+      orgs: toOrgCounts(orgTotals),
+      total: listingsTotal + gesucheTotal + postsTotal,
+    };
+  }).filter((c) => c.lat !== 0 && c.total > 0);
+
+  // Placeholders so the map shows at least Paris + London even before any content
   if (cityStats.length === 0) {
+    const empty = (slug: string, name: string, lat: number, lng: number): CityStats => ({
+      slug, name, lat, lng,
+      listings: [], listingsTotal: 0,
+      gesuche: [], gesucheTotal: 0,
+      posts: [], postsTotal: 0,
+      orgs: [], total: 0,
+    });
     cityStats.push(
-      { slug: 'paris', name: 'Paris', lat: 48.8566, lng: 2.3522, orgs: [{ org: 'hec', count: 0 }], total: 0 },
-      { slug: 'london', name: 'London', lat: 51.5074, lng: -0.1278, orgs: [{ org: 'lbs', count: 0 }], total: 0 }
+      empty('paris', 'Paris', 48.8566, 2.3522),
+      empty('london', 'London', 51.5074, -0.1278),
     );
   }
 
   const totalActivity = cityStats.reduce((s, c) => s + c.total, 0);
-  const topCity = cityStats.sort((a, b) => b.total - a.total)[0];
+  const topCity = [...cityStats].sort((a, b) => b.total - a.total)[0];
 
   return (
     <div className="flex h-[calc(100vh-56px)] flex-col">
-      {/* Top bar */}
       <div className="flex items-center justify-between border-b border-border bg-zinc-950 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-4">
           <Link href="/feed" className="flex items-center gap-1.5 text-sm text-white/60 hover:text-white">
@@ -104,14 +149,13 @@ export default async function MapPage() {
         </div>
         <div className="hidden items-center gap-6 text-xs text-white/50 sm:flex">
           <span><span className="font-semibold text-white">{totalActivity}</span> Aktivitäten</span>
-          <span><span className="font-semibold text-white">{cityStats.length}</span> Städte</span>
+          <span><span className="font-semibold text-white">{cityStats.filter(c => c.total > 0).length}</span> Städte</span>
           {topCity && topCity.total > 0 && (
             <span>Top: <span className="font-semibold text-white">{topCity.name}</span></span>
           )}
         </div>
       </div>
 
-      {/* Full-height map */}
       <div className="relative flex-1 overflow-hidden">
         <HeatmapLoader cities={cityStats} />
       </div>

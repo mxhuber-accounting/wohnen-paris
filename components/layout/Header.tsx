@@ -53,6 +53,7 @@ export default function Header() {
     ...(user ? [{ href: '/feed', label: 'Aktuell' }] : []),
     { href: '/anzeigen', label: t('browse') },
     { href: '/community', label: 'Community' },
+    { href: '/schulen', label: 'Schulen' },
     { href: '/gesuche', label: 'Gesuche' },
     { href: '/map', label: 'Weltkarte' },
     { href: '/anzeige-aufgeben', label: t('post') },

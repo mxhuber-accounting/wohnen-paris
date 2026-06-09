@@ -4,12 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import ActivityFeed, { type FeedItem } from '@/components/feed/ActivityFeed';
 import LiveUserCount from '@/components/ui/LiveUserCount';
 import { Home, MessageSquare, Search, Globe } from 'lucide-react';
-import { ORG_LABEL, ORG_COLOR } from '@/lib/orgs';
-
-const ORG_EMOJI: Record<string, string> = {
-  hec: '🎓', sciencespo: '🏛️', escp: '📊', insead: '🌐',
-  lbs: '💼', lse: '📈', ucl: '🔬', imperial: '⚙️', other: '🎯',
-};
+import { ORG_LABEL, ORG_COLOR, ORG_EMOJI } from '@/lib/orgs';
 
 export default async function FeedPage() {
   const supabase = await createClient();

@@ -29,13 +29,12 @@ export default async function PostListingPage() {
     );
   }
 
-  const { data: city } = await supabase
+  const { data: cities } = await supabase
     .from('cities')
-    .select('id')
-    .eq('slug', 'paris')
-    .single();
+    .select('id, slug, name')
+    .order('name');
 
-  if (!city) redirect('/');
+  if (!cities || cities.length === 0) redirect('/');
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
@@ -43,7 +42,7 @@ export default async function PostListingPage() {
         {t('create.title')}
       </h1>
       <div className="rounded-xl border border-stone-200 bg-white p-6 sm:p-8">
-        <CreateListingForm userId={user.id} cityId={city.id} />
+        <CreateListingForm userId={user.id} cities={cities} />
       </div>
     </div>
   );
