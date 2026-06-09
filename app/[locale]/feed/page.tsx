@@ -138,9 +138,7 @@ export default async function FeedPage() {
           </h1>
           <p className="mt-1 text-sm text-muted">Was gibt es Neues in deiner Community?</p>
         </div>
-        <div className="hidden sm:block">
-          <LiveUserCount />
-        </div>
+        <LiveUserCount />
       </div>
 
       {/* Debug: show query errors if any */}
@@ -170,10 +168,6 @@ export default async function FeedPage() {
 
         {/* Sidebar */}
         <aside className="space-y-5">
-
-          <div className="sm:hidden">
-            <LiveUserCount />
-          </div>
 
           {/* Quick actions */}
           <div className="rounded-2xl border border-border bg-surface p-5">

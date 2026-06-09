@@ -12,16 +12,20 @@ export default function LiveUserCount() {
       config: { presence: { key: Math.random().toString(36).slice(2) } },
     });
 
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        setCount(Object.keys(state).length);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({ online_at: new Date().toISOString() });
-        }
-      });
+    try {
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          const state = channel.presenceState();
+          setCount(Object.keys(state).length);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.track({ online_at: new Date().toISOString() });
+          }
+        });
+    } catch {
+      // channel already subscribed from another instance — safe to ignore
+    }
 
     return () => { supabase.removeChannel(channel); };
   }, []);
