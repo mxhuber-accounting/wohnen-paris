@@ -25,6 +25,7 @@
   },
   "nav": {
     "browse": "Listings",
+    "community": "Community",
     "post": "Post a listing",
     "login": "Log in",
     "myListings": "My listings",

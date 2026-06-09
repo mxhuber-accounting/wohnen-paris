@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Menu, X } from 'lucide-react';
 
@@ -25,6 +25,12 @@ export default function Header() {
             className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
           >
             {t('browse')}
+          </Link>
+          <Link
+            href="/community"
+            className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
+          >
+            {t('community')}
           </Link>
           <Link
             href="/anzeige-aufgeben"
@@ -60,6 +66,13 @@ export default function Header() {
               onClick={() => setOpen(false)}
             >
               {t('browse')}
+            </Link>
+            <Link
+              href="/community"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100"
+              onClick={() => setOpen(false)}
+            >
+              {t('community')}
             </Link>
             <Link
               href="/anzeige-aufgeben"
