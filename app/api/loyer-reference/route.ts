@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import type { LoyerData, RentRow } from '@/lib/loyer-types';
 
 const DATASET_ID = '62a7243912f22dbff558476d';
@@ -19,15 +21,14 @@ function toNum(s: string) {
 
 export async function GET() {
   try {
-    const [geoRes, metaRes] = await Promise.all([
-      fetch('https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/arrondissements/exports/geojson?lang=fr', { cache: 'force-cache' }),
-      fetch(`https://www.data.gouv.fr/api/1/datasets/${DATASET_ID}/`, { cache: 'force-cache' }),
-    ]);
+    // GeoJSON is bundled statically — no external fetch needed
+    const geoJson = JSON.parse(
+      readFileSync(join(process.cwd(), 'public', 'paris-arrondissements.geojson'), 'utf-8')
+    );
 
-    if (!geoRes.ok) throw new Error(`GeoJSON: ${geoRes.status}`);
+    const metaRes = await fetch(`https://www.data.gouv.fr/api/1/datasets/${DATASET_ID}/`);
     if (!metaRes.ok) throw new Error(`data.gouv.fr: ${metaRes.status}`);
-
-    const [geoJson, meta] = await Promise.all([geoRes.json(), metaRes.json()]);
+    const meta = await metaRes.json();
 
     const resources: any[] = meta.resources ?? [];
     const csv = resources
@@ -36,7 +37,7 @@ export async function GET() {
 
     if (!csv?.url) throw new Error('No CSV found in dataset');
 
-    const csvRes = await fetch(csv.url, { cache: 'force-cache' });
+    const csvRes = await fetch(csv.url);
     if (!csvRes.ok) throw new Error(`CSV: ${csvRes.status}`);
     const rows = parseCsv(await csvRes.text());
 
