@@ -57,7 +57,9 @@ function PostCard({ post }: { post: CommunityPost }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm font-semibold text-stone-900">{post.display_name}</span>
+          <a href={`/profil/${post.user_id}`} className="text-sm font-semibold text-stone-900 hover:text-accent hover:underline">
+                {post.display_name}
+              </a>
           {post.city_slug && (
             <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${CITY_BADGE[post.city_slug] ?? 'bg-stone-100 text-stone-500'}`}>
               {post.city_name}

@@ -138,7 +138,10 @@ export default async function ListingDetailPage({
         {/* Poster */}
         {profile?.display_name && (
           <p className="mt-6 text-xs text-stone-400">
-            {t('detail.postedBy')}: <span className="text-stone-600">{profile.display_name}</span>
+            {t('detail.postedBy')}:{' '}
+            <Link href={`/profil/${listing.user_id}` as any} className="text-stone-600 hover:text-accent hover:underline">
+              {profile.display_name}
+            </Link>
           </p>
         )}
 
