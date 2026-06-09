@@ -12,15 +12,24 @@ export default function LoyerMapStandalone() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/loyer-reference').then(r => r.json()),
-      fetch('/paris-arrondissements.json').then(r => r.json()),
-    ])
-      .then(([rents, geoJson]) => {
-        if (rents.error) { setError(rents.error); return; }
+    (async () => {
+      try {
+        const r1 = await fetch('/api/loyer-reference');
+        const t1 = await r1.text();
+        let rents: any;
+        try { rents = JSON.parse(t1); } catch { setError(`API parse fail (${r1.status}): ${t1.slice(0, 200)}`); return; }
+        if (rents.error) { setError(`API error: ${rents.error}`); return; }
+
+        const r2 = await fetch('/paris-arrondissements.json');
+        const t2 = await r2.text();
+        let geoJson: any;
+        try { geoJson = JSON.parse(t2); } catch { setError(`GeoJSON parse fail (${r2.status}): ${t2.slice(0, 200)}`); return; }
+
         setData({ ...rents, geoJson });
-      })
-      .catch(e => setError(String(e)));
+      } catch (e) {
+        setError(`Fetch error: ${String(e)}`);
+      }
+    })();
   }, []);
 
   if (error) {
