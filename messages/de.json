@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "browse": "Anzeigen",
+    "post": "Anzeige aufgeben",
+    "login": "Anmelden",
+    "myListings": "Meine Anzeigen",
+    "messages": "Nachrichten"
+  },
+  "landing": {
+    "hero": {
+      "title": "Deine Wohnung in Paris —",
+      "titleAccent": "auf Deutsch.",
+      "subtitle": "Wohnungsanzeigen für deutschsprachige Expats und Studierende in Paris. Direkt, transparent, ohne Makler.",
+      "ctaBrowse": "Anzeigen durchsuchen",
+      "ctaPost": "Anzeige aufgeben"
+    },
+    "stats": {
+      "listings": "aktive Anzeigen",
+      "arrondissements": "Arrondissements",
+      "free": "Kostenlos"
+    },
+    "values": {
+      "title": "Warum Wohnen in Paris?",
+      "v1Title": "Auf Deutsch",
+      "v1Desc": "Alle Anzeigen und Nachrichten auf Deutsch — kein Übersetzen, kein Missverständnis.",
+      "v2Title": "Direkt & ohne Makler",
+      "v2Desc": "Du schreibst direkt dem Vermieter oder Nachmieter. Keine Provision, keine Zwischenhändler.",
+      "v3Title": "Nur echte Angebote",
+      "v3Desc": "Jede Anzeige kommt von einer echten Person. Verdächtige Inserate können gemeldet werden."
+    },
+    "howItWorks": {
+      "title": "Wie es funktioniert",
+      "step1Num": "1",
+      "step1Title": "Anzeige finden",
+      "step1Desc": "Durchsuche aktuelle Angebote nach Arrondissement, Preis, Zimmeranzahl und Typ.",
+      "step2Num": "2",
+      "step2Title": "Nachricht senden",
+      "step2Desc": "Schreib dem Vermieter direkt auf Deutsch — kein Makler, keine Umwege.",
+      "step3Num": "3",
+      "step3Title": "Einziehen",
+      "step3Desc": "Vereinbare einen Besichtigungstermin und finde dein neues Zuhause in Paris."
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "items": [
+        {
+          "q": "Ist die Nutzung kostenlos?",
+          "a": "Ja — das Einstellen und Suchen von Anzeigen ist vollständig kostenlos."
+        },
+        {
+          "q": "Für wen ist diese Plattform gedacht?",
+          "a": "Für deutschsprachige Menschen, die in Paris eine Wohnung suchen oder vermieten möchten — Expats, Studierende, Au-pairs und alle anderen."
+        },
+        {
+          "q": "Welche Arten von Anzeigen gibt es?",
+          "a": "Ganze Wohnungen, WG-Zimmer und Zwischenmieten. Möbliert und unmöbliert. Kurz- und Langzeitvermietung."
+        },
+        {
+          "q": "Wie schützt ihr meine Daten?",
+          "a": "Wir speichern nur, was nötig ist. Deine genaue Adresse wird nie öffentlich angezeigt. Alle Daten werden DSGVO-konform verarbeitet."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Bereit loszulegen?",
+      "subtitle": "Erstelle ein kostenloses Konto und finde oder vermiete in wenigen Minuten.",
+      "button": "Jetzt kostenlos starten"
+    }
+  },
+  "footer": {
+    "tagline": "Wohnungsanzeigen für Deutschsprachige in Paris.",
+    "links": "Navigation",
+    "legal": "Rechtliches",
+    "browse": "Anzeigen durchsuchen",
+    "post": "Anzeige aufgeben",
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz",
+    "agb": "AGB",
+    "copyright": "Wohnen in Paris. Alle Rechte vorbehalten."
+  }
+}

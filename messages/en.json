@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "browse": "Listings",
+    "post": "Post a listing",
+    "login": "Log in",
+    "myListings": "My listings",
+    "messages": "Messages"
+  },
+  "landing": {
+    "hero": {
+      "title": "Your apartment in Paris —",
+      "titleAccent": "in German.",
+      "subtitle": "Apartment listings for German-speaking expats and students in Paris. Direct, transparent, no agency fees.",
+      "ctaBrowse": "Browse listings",
+      "ctaPost": "Post a listing"
+    },
+    "stats": {
+      "listings": "active listings",
+      "arrondissements": "arrondissements",
+      "free": "Free to use"
+    },
+    "values": {
+      "title": "Why Wohnen in Paris?",
+      "v1Title": "In German",
+      "v1Desc": "All listings and messages in German — no translating, no misunderstandings.",
+      "v2Title": "Direct & no agency",
+      "v2Desc": "You write directly to the landlord or subtenant. No commission, no middlemen.",
+      "v3Title": "Real listings only",
+      "v3Desc": "Every listing comes from a real person. Suspicious posts can be reported."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1Num": "1",
+      "step1Title": "Find a listing",
+      "step1Desc": "Search current offers by arrondissement, price, room count and type.",
+      "step2Num": "2",
+      "step2Title": "Send a message",
+      "step2Desc": "Write directly to the landlord in German — no agents, no detours.",
+      "step3Num": "3",
+      "step3Title": "Move in",
+      "step3Desc": "Arrange a viewing and find your new home in Paris."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Is it free to use?",
+          "a": "Yes — posting and searching listings is completely free."
+        },
+        {
+          "q": "Who is this platform for?",
+          "a": "For German speakers looking to rent or let in Paris — expats, students, au pairs and anyone else."
+        },
+        {
+          "q": "What types of listings are there?",
+          "a": "Full apartments, flatshare rooms, and sublets. Furnished and unfurnished. Short and long term."
+        },
+        {
+          "q": "How do you protect my data?",
+          "a": "We store only what is necessary. Your exact address is never shown publicly. All data is processed GDPR-compliantly."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "subtitle": "Create a free account and find or list in minutes.",
+      "button": "Start for free"
+    }
+  },
+  "footer": {
+    "tagline": "Apartment listings for German speakers in Paris.",
+    "links": "Links",
+    "legal": "Legal",
+    "browse": "Browse listings",
+    "post": "Post a listing",
+    "impressum": "Imprint",
+    "datenschutz": "Privacy policy",
+    "agb": "Terms",
+    "copyright": "Wohnen in Paris. All rights reserved."
+  }
+}
