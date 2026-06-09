@@ -14,9 +14,14 @@ export default function LoyerMapStandalone() {
   useEffect(() => {
     fetch('/api/loyer-reference')
       .then(async r => {
-        const d = await r.json();
-        if (d.error) setError(d.error);
-        else setData(d);
+        const text = await r.text();
+        try {
+          const d = JSON.parse(text);
+          if (d.error) setError(d.error);
+          else setData(d);
+        } catch {
+          setError(`HTTP ${r.status} — ${text.slice(0, 300)}`);
+        }
       })
       .catch(e => setError(String(e)));
   }, []);
