@@ -5,84 +5,88 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X } from 'lucide-react';
-import type { LoyerData, RentRow } from '@/lib/loyer-types';
+import type { LoyerData, RentRow, City } from '@/lib/loyer-types';
+import { CITY_CONFIG } from '@/lib/loyer-types';
 
 type Props = {
   data: LoyerData;
-  highlightArrondissement?: number;
+  highlightZone?: number;
   defaultPieces?: number;
   defaultMeuble?: boolean;
   onClose: () => void;
 };
 
 function lerp(t: number): string {
-  // light purple → dark purple: #ede9fe → #5b21b6
   const r = Math.round(237 + t * (91 - 237));
   const g = Math.round(233 + t * (33 - 233));
   const b = Math.round(254 + t * (182 - 254));
   return `rgb(${r},${g},${b})`;
 }
 
-function avgField(rows: RentRow[], pieces: number, meuble: boolean, field: keyof RentRow): number {
+function avgRef(rows: RentRow[], pieces: number, meuble: boolean): number {
   const f = rows.filter(r => r.pieces === pieces && r.meuble === meuble);
-  return f.length ? f.reduce((s, r) => s + (r[field] as number), 0) / f.length : 0;
+  return f.length ? f.reduce((s, r) => s + r.ref, 0) / f.length : 0;
 }
 
-function FitParis() {
+function FitCity({ city }: { city: City }) {
   const map = useMap();
-  useEffect(() => { map.setView([48.8566, 2.3522], 12); }, []);
+  const cfg = CITY_CONFIG[city];
+  useEffect(() => { map.setView(cfg.center, cfg.zoom); }, [city]);
   return null;
 }
 
 export default function ReferenceRentMap({
   data,
-  highlightArrondissement,
+  highlightZone,
   defaultPieces = 2,
   defaultMeuble = true,
   onClose,
 }: Props) {
   const [pieces, setPieces] = useState(defaultPieces);
   const [meuble, setMeuble] = useState(defaultMeuble);
-  const [selected, setSelected] = useState<{ arrNum: number; name: string } | null>(null);
+  const [selected, setSelected] = useState<{ zone: number; label: string } | null>(null);
 
-  const values = Object.values(data.byArrondissement)
-    .map(rows => avgField(rows, pieces, meuble, 'ref'))
+  const cfg = CITY_CONFIG[data.city];
+
+  const values = Object.values(data.byZone)
+    .map(rows => avgRef(rows, pieces, meuble))
     .filter(v => v > 0);
-  const minVal = values.length ? Math.min(...values) : 20;
+  const minVal = values.length ? Math.min(...values) : 10;
   const maxVal = values.length ? Math.max(...values) : 35;
 
   const geoStyle = useCallback((feature: any) => {
-    const n = feature?.properties?.c_ar as number;
-    const avg = avgField(data.byArrondissement[n] ?? [], pieces, meuble, 'ref');
+    const zone = feature?.properties?.id_zone as number;
+    const avg = avgRef(data.byZone[zone] ?? [], pieces, meuble);
     const t = avg > 0 ? Math.max(0, Math.min(1, (avg - minVal) / (maxVal - minVal))) : -1;
     return {
       fillColor: t >= 0 ? lerp(t) : '#e5e7eb',
       fillOpacity: 0.85,
-      color: n === highlightArrondissement ? '#7c3aed' : '#fff',
-      weight: n === highlightArrondissement ? 3 : 1.5,
+      color: zone === highlightZone ? '#7c3aed' : '#fff',
+      weight: zone === highlightZone ? 3 : 1,
     };
-  }, [data, pieces, meuble, minVal, maxVal, highlightArrondissement]);
+  }, [data, pieces, meuble, minVal, maxVal, highlightZone]);
 
   const onEach = useCallback((feature: any, layer: L.Layer) => {
-    const n = feature?.properties?.c_ar as number;
-    const name = feature?.properties?.l_ar ?? `Paris ${n}e`;
+    const zone = feature?.properties?.id_zone as number;
+    const label = feature?.properties?.nom_quartier
+      ?? feature?.properties?.commune
+      ?? `Zone ${zone}`;
     const path = layer as L.Path;
     path.on({
-      click: () => setSelected({ arrNum: n, name }),
-      mouseover() { path.setStyle({ weight: 3, color: '#7c3aed', fillOpacity: 1 }); },
+      click: () => setSelected({ zone, label }),
+      mouseover() { path.setStyle({ weight: 2, color: '#7c3aed', fillOpacity: 1 }); },
       mouseout() { path.setStyle(geoStyle(feature)); },
     });
   }, [geoStyle]);
 
-  const selRows = selected ? (data.byArrondissement[selected.arrNum] ?? []) : [];
+  const selRows = selected ? (data.byZone[selected.zone] ?? []) : [];
 
   return (
     <div className="fixed inset-0 z-[9000] flex flex-col bg-white">
-      {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-white px-4 py-3">
         <div>
           <h2 className="font-serif text-base font-semibold text-foreground">
-            Encadrement des loyers — Paris
+            Encadrement des loyers — {cfg.label}
           </h2>
           <p className="text-xs text-muted">DRIHL · data.gouv.fr · {data.year}</p>
         </div>
@@ -118,44 +122,38 @@ export default function ReferenceRentMap({
         </div>
       </div>
 
-      {/* Map */}
       <div className="relative flex-1 overflow-hidden">
-        <MapContainer center={[48.8566, 2.3522]} zoom={12} style={{ height: '100%', width: '100%' }} zoomControl>
+        <MapContainer center={cfg.center} zoom={cfg.zoom} style={{ height: '100%', width: '100%' }} zoomControl>
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://carto.com">CARTO</a>'
             subdomains="abcd"
           />
-          <GeoJSON key={`${pieces}-${meuble}`} data={data.geoJson} style={geoStyle} onEachFeature={onEach} />
-          <FitParis />
+          <GeoJSON key={`${data.city}-${pieces}-${meuble}`} data={data.geoJson} style={geoStyle} onEachFeature={onEach} />
+          <FitCity city={data.city} />
         </MapContainer>
 
-        {/* Legend */}
         <div className="absolute bottom-4 left-4 z-[1000] rounded-xl border border-border bg-white/90 p-3 text-xs shadow backdrop-blur-sm">
           <p className="mb-1.5 font-semibold text-foreground">€/m² · Loyer de référence</p>
           <div className="flex items-center gap-2">
             <span className="text-muted">{minVal.toFixed(0)}</span>
-            <div
-              className="h-3 w-28 rounded-full"
-              style={{ background: `linear-gradient(to right, ${lerp(0)}, ${lerp(1)})` }}
-            />
+            <div className="h-3 w-28 rounded-full" style={{ background: `linear-gradient(to right, ${lerp(0)}, ${lerp(1)})` }} />
             <span className="text-muted">{maxVal.toFixed(0)}</span>
           </div>
-          {highlightArrondissement && (
+          {highlightZone && (
             <p className="mt-1.5 flex items-center gap-1.5 text-muted">
               <span className="inline-block h-2 w-3 rounded-sm border-2 border-purple-600" />
-              Paris {highlightArrondissement}e · ce logement
+              Zone {highlightZone} · ce logement
             </p>
           )}
         </div>
 
-        {/* Arrondissement detail popup */}
         {selected && (
           <div className="absolute bottom-4 right-4 z-[1000] w-68 rounded-2xl border border-border bg-white p-5 shadow-lg">
             <div className="mb-3 flex items-start justify-between">
               <div>
-                <h3 className="font-serif text-sm font-semibold text-foreground">{selected.name}</h3>
-                <p className="text-xs text-muted">{meuble ? 'Meublé' : 'Non meublé'}</p>
+                <h3 className="font-serif text-sm font-semibold text-foreground">{selected.label}</h3>
+                <p className="text-xs text-muted">{meuble ? 'Meublé' : 'Non meublé'} · Zone {selected.zone}</p>
               </div>
               <button onClick={() => setSelected(null)} className="text-muted hover:text-foreground">
                 <X size={14} />
@@ -182,7 +180,7 @@ export default function ReferenceRentMap({
                 );
               })}
             </div>
-            <p className="mt-3 text-[10px] text-muted">Moy. des époques de construction</p>
+            <p className="mt-3 text-[10px] text-muted">Moy. des époques · Source: DRIHL</p>
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { TrendingUp, TrendingDown, Minus, Map } from 'lucide-react';
 import type { LoyerData, RentRow } from '@/lib/loyer-types';
+import { PARIS_ARR_TO_ZONE } from '@/lib/loyer-types';
 
 const ReferenceRentMap = dynamic(() => import('./ReferenceRentMap'), { ssr: false });
 
@@ -15,7 +16,7 @@ type Props = {
   sizeSqm: number | null;
 };
 
-function avgRef(rows: RentRow[], pieces: number, meuble: boolean) {
+function getRef(rows: RentRow[], pieces: number, meuble: boolean) {
   const f = rows.filter(r => r.pieces === pieces && r.meuble === meuble);
   if (!f.length) return null;
   return {
@@ -31,17 +32,21 @@ export default function LoyerReference({ arrondissement, rooms, furnished, kaltm
   const [error, setError] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(false);
 
+  const zone = PARIS_ARR_TO_ZONE[arrondissement];
+
   useEffect(() => {
+    if (!zone) { setLoading(false); return; }
+
     Promise.all([
-      fetch('/api/loyer-reference').then(r => r.json()),
-      fetch('/paris-arrondissements.json').then(r => r.json()),
+      fetch('/api/loyer-reference?city=paris').then(r => r.json()),
+      fetch('/paris-zones.json').then(r => r.json()),
     ])
       .then(([rents, geoJson]) => {
         if (rents.error) { setError(rents.error); } else { setData({ ...rents, geoJson }); }
         setLoading(false);
       })
       .catch(e => { setError(e.message); setLoading(false); });
-  }, []);
+  }, [zone]);
 
   if (loading) return (
     <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
@@ -52,20 +57,15 @@ export default function LoyerReference({ arrondissement, rooms, furnished, kaltm
     </div>
   );
 
-  if (error) return (
-    <div className="mt-6 rounded-2xl border border-border bg-surface p-5 text-xs text-muted">
-      Loyer de référence konnte nicht geladen werden: {error}
-    </div>
-  );
-
+  if (error || !zone) return null;
   if (!data) return null;
 
   const pieces = Math.min(rooms ?? 1, 4);
   const meuble = furnished ?? true;
-  const arrRows = data.byArrondissement[arrondissement];
-  if (!arrRows) return null;
+  const zoneRows = data.byZone[zone];
+  if (!zoneRows) return null;
 
-  const ref = avgRef(arrRows, pieces, meuble);
+  const ref = getRef(zoneRows, pieces, meuble);
   if (!ref || ref.ref === 0) return null;
 
   let comparison: { pct: number; status: 'above' | 'below' | 'at' } | null = null;
@@ -143,7 +143,7 @@ export default function LoyerReference({ arrondissement, rooms, furnished, kaltm
       {showMap && (
         <ReferenceRentMap
           data={data}
-          highlightArrondissement={arrondissement}
+          highlightZone={zone}
           defaultPieces={pieces}
           defaultMeuble={meuble}
           onClose={() => setShowMap(false)}
