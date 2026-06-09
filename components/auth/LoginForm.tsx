@@ -26,7 +26,7 @@ export default function LoginForm() {
 
     setLoading(false);
     if (error) {
-      setError(t('error'));
+      setError(error.message);
     } else {
       setSent(true);
     }
